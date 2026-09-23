@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+﻿from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -72,7 +72,7 @@ def book_appointment(request):
         try:
             send_mail(
                 f'Appointment Confirmation - {appointment_date}',
-                f'Dear {patient_name},\n\nYour appointment has been booked successfully.\n\nDetails:\nDate: {appointment_date}\nTime: {appointment_time}\nService: {appointment.service_name}\nAmount to Pay: Rs. {amount}\n\nPlease complete the payment to confirm your appointment.\n\nThank you for choosing Shree Krishna Dental & Eye Care.',
+                f'Dear {patient_name},\n\nYour appointment has been booked successfully.\n\nDetails:\nDate: {appointment_date}\nTime: {appointment_time}\nService: {appointment.service_name}\nAmount to Pay: Rs. {amount}\n\nPlease complete the payment to confirm your appointment.\n\nThank you for choosing Bishanil Dental & Eye Care.',
                 settings.DEFAULT_FROM_EMAIL,
                 [patient_email],
                 fail_silently=True,

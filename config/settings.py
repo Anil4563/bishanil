@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 from decouple import config
 
@@ -110,7 +110,7 @@ LOGOUT_REDIRECT_URL = '/'
 LOGOUT_URL = '/accounts/logout/'
 
 # SEO Settings
-CANONICAL_URL = 'https://www.shreekrishnadental.com'  # Change to your domain
+CANONICAL_URL = 'https://www.bishanildental.com'  # Change to your domain
 DEFAULT_META_IMAGE = '/static/images/og-image.jpg'
 
 # Payment Gateway Settings

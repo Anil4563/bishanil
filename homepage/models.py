@@ -1,9 +1,9 @@
-from django.db import models
+﻿from django.db import models
 
 class AboutUs(models.Model):
     """About Us content that can be edited from admin"""
     
-    title = models.CharField(max_length=200, default='About Shree Krishna Dental')
+    title = models.CharField(max_length=200, default='About Bishanil Dental')
     subtitle = models.CharField(max_length=300, blank=True, null=True)
     description = models.TextField()
     mission_text = models.TextField(blank=True, null=True)
@@ -49,7 +49,7 @@ class Testimonial(models.Model):
         verbose_name_plural = "Testimonials"
     
     def __str__(self):
-        return f"{self.patient_name} - {self.rating}★"
+        return f"{self.patient_name} - {self.rating}â˜…"
 
 class ClinicFeature(models.Model):
     """Features that can be edited from admin"""

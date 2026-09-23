@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+﻿from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
@@ -49,8 +49,8 @@ def submit_inquiry(request):
             
             # Send auto-reply to user
             send_mail(
-                'We have received your inquiry - Shree Krishna Dental & Eye Care',
-                f'Dear {name},\n\nThank you for contacting Shree Krishna Dental & Eye Care. We have received your inquiry and will get back to you within 24 hours.\n\nBest regards,\nShree Krishna Dental & Eye Care Team',
+                'We have received your inquiry - Bishanil Dental & Eye Care',
+                f'Dear {name},\n\nThank you for contacting Bishanil Dental & Eye Care. We have received your inquiry and will get back to you within 24 hours.\n\nBest regards,\nBishanil Dental & Eye Care Team',
                 settings.DEFAULT_FROM_EMAIL,
                 [email],
                 fail_silently=True,
@@ -98,7 +98,7 @@ def submit_support(request):
         try:
             send_mail(
                 f'Support Ticket Created - {ticket_id}',
-                f'Dear {patient_name},\n\nYour support ticket has been created.\n\nTicket ID: {ticket_id}\nSubject: {subject}\nPriority: {priority}\n\nWe will respond to your query within 24 hours.\n\nYou can track your ticket status by quoting this ID.\n\nBest regards,\nShree Krishna Dental & Eye Care Team',
+                f'Dear {patient_name},\n\nYour support ticket has been created.\n\nTicket ID: {ticket_id}\nSubject: {subject}\nPriority: {priority}\n\nWe will respond to your query within 24 hours.\n\nYou can track your ticket status by quoting this ID.\n\nBest regards,\nBishanil Dental & Eye Care Team',
                 settings.DEFAULT_FROM_EMAIL,
                 [patient_email],
                 fail_silently=True,

@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+﻿from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -83,7 +83,7 @@ def doctor_register(request):
         if form.is_valid():
             # Create User account for doctor
             username = form.cleaned_data['name'].lower().replace(' ', '_')
-            email = f"{username}@shreekrishnadental.com"
+            email = f"{username}@bishanildental.com"
             password = form.cleaned_data['password']
             
             # Check if user already exists
@@ -346,7 +346,7 @@ def print_prescription(request, prescription_id):
         <body>
             <div class="prescription-box">
                 <div class="header">
-                    <h1>Shree Krishna Dental & Eye Care</h1>
+                    <h1>Bishanil Dental & Eye Care</h1>
                     <p>Kathmandu, Nepal | Tel: +977 9800000000</p>
                 </div>
                 

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+﻿from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
@@ -179,7 +179,7 @@ def download_invoice(request, invoice_number):
     <body>
         <div class="invoice-box">
             <div class="header">
-                <h1>Shree Krishna Dental & Eye Care</h1>
+                <h1>Bishanil Dental & Eye Care</h1>
                 <p>Kathmandu, Nepal | +977 9800000000</p>
             </div>
             <div class="details">
@@ -206,7 +206,7 @@ def download_invoice(request, invoice_number):
                 Total: Rs. {transaction.amount}
             </div>
             <div class="footer">
-                <p>Thank you for choosing Shree Krishna Dental & Eye Care</p>
+                <p>Thank you for choosing Bishanil Dental & Eye Care</p>
                 <p>This is a computer-generated invoice. No signature required.</p>
             </div>
         </div>

@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
@@ -71,7 +71,7 @@ class BlogPost(models.Model):
     featured_image = models.ImageField(upload_to='blog/', blank=True, null=True)
     
     # Author
-    author_name = models.CharField(max_length=200, default='Shree Krishna Team')
+    author_name = models.CharField(max_length=200, default='Bishanil Team')
     author_image = models.ImageField(upload_to='blog/authors/', blank=True, null=True)
     author_bio = models.TextField(blank=True)
     

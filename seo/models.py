@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 from django.contrib.sites.models import Site
 from django.utils.html import strip_tags
 
@@ -9,7 +9,7 @@ class SEOSettings(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='seo_settings')
     
     # Site Information
-    site_name = models.CharField(max_length=200, default='Shree Krishna Dental & Eye Care')
+    site_name = models.CharField(max_length=200, default='Bishanil Dental & Eye Care')
     site_tagline = models.CharField(max_length=300, blank=True)
     site_description = models.TextField(max_length=500, default='Best dental and eye care services in Kathmandu, Nepal. Expert doctors, advanced technology, affordable prices.')
     site_keywords = models.CharField(max_length=500, default='dental clinic, eye care, dentist, ophthalmologist, tooth implant, cataract surgery, LASIK')

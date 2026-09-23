@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+﻿from django.http import HttpResponse
 
 def robots_txt(request):
     lines = [
@@ -10,7 +10,7 @@ def robots_txt(request):
         "Disallow: /accounts/register/",
         "Disallow: /appointments/emergency/",
         "",
-        "Sitemap: https://www.shreekrishnadental.com/sitemap.xml",
+        "Sitemap: https://www.bishanildental.com/sitemap.xml",
         "",
         "# Crawl delay",
         "Crawl-delay: 1",

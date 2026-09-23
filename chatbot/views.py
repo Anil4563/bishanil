@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+﻿from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -60,11 +60,11 @@ def find_best_faq(message):
 
 def get_greeting_response():
     """Return greeting message"""
-    return "👋 Hello! I'm Shree Krishna's virtual assistant. How can I help you today?\n\nI can help you with:\n• Dental & Eye Care services\n• Appointment booking\n• Clinic timings & location\n• Treatment costs\n• Emergency care\n\nJust type your question!"
+    return "ðŸ‘‹ Hello! I'm Bishanil's virtual assistant. How can I help you today?\n\nI can help you with:\nâ€¢ Dental & Eye Care services\nâ€¢ Appointment booking\nâ€¢ Clinic timings & location\nâ€¢ Treatment costs\nâ€¢ Emergency care\n\nJust type your question!"
 
 def get_fallback_response():
     """Return fallback response when no match found"""
-    return "I'm not sure about that. Could you please rephrase your question?\n\nYou can also:\n• Call us at +977 9800000000\n• Book an appointment online\n• Visit our clinic\n\nHow else can I help you?"
+    return "I'm not sure about that. Could you please rephrase your question?\n\nYou can also:\nâ€¢ Call us at +977 9800000000\nâ€¢ Book an appointment online\nâ€¢ Visit our clinic\n\nHow else can I help you?"
 
 def process_message(message, conversation):
     """Process user message and generate bot response"""
@@ -72,27 +72,27 @@ def process_message(message, conversation):
     
     # Greeting patterns
     if any(word in message_lower for word in ['hi', 'hello', 'hey', 'namaste']):
-        return "Namaste! 🙏 Welcome to Shree Krishna Dental & Eye Care. How may I assist you today?"
+        return "Namaste! ðŸ™ Welcome to Bishanil Dental & Eye Care. How may I assist you today?"
     
     # Appointment related
     if any(word in message_lower for word in ['appointment', 'book', 'schedule']):
-        return "📅 To book an appointment:\n\n1. Click on 'Book Appointment' in our menu\n2. Call us at +977 9800000000\n3. Visit our clinic\n\nWould you like me to help you book one right now?"
+        return "ðŸ“… To book an appointment:\n\n1. Click on 'Book Appointment' in our menu\n2. Call us at +977 9800000000\n3. Visit our clinic\n\nWould you like me to help you book one right now?"
     
     # Timings
     if any(word in message_lower for word in ['timing', 'hour', 'open', 'close', 'time']):
-        return "⏰ Our Clinic Hours:\n\nMonday-Friday: 9:00 AM - 8:00 PM\nSaturday-Sunday: 10:00 AM - 5:00 PM\n\nEmergency: 24/7 available"
+        return "â° Our Clinic Hours:\n\nMonday-Friday: 9:00 AM - 8:00 PM\nSaturday-Sunday: 10:00 AM - 5:00 PM\n\nEmergency: 24/7 available"
     
     # Location
     if any(word in message_lower for word in ['location', 'address', 'where', 'clinic']):
-        return "📍 Our Location:\nShree Krishna Dental & Eye Care\nKathmandu, Nepal\n\nGoogle Maps: [Click for directions]\n\nNeed help finding us?"
+        return "ðŸ“ Our Location:\nBishanil Dental & Eye Care\nKathmandu, Nepal\n\nGoogle Maps: [Click for directions]\n\nNeed help finding us?"
     
     # Emergency
     if any(word in message_lower for word in ['emergency', 'urgent', 'immediate', 'pain']):
-        return "🚨 EMERGENCY SERVICE (24/7)\n\n📞 Call: +977 9800000000\n🏥 Visit our clinic immediately\n\nFor severe pain or accidents, please come to our clinic or call our emergency number right away!"
+        return "ðŸš¨ EMERGENCY SERVICE (24/7)\n\nðŸ“ž Call: +977 9800000000\nðŸ¥ Visit our clinic immediately\n\nFor severe pain or accidents, please come to our clinic or call our emergency number right away!"
     
     # Pricing
     if any(word in message_lower for word in ['price', 'cost', 'fee', 'charge', 'payment']):
-        return "💰 Our consultation fee starts from ₹500.\n\nFor specific treatments:\n• Dental Checkup: ₹500\n• Eye Checkup: ₹500\n• Root Canal: ₹2000 onwards\n• Cataract Surgery: ₹25,000 onwards\n\nWould you like a detailed price list?"
+        return "ðŸ’° Our consultation fee starts from â‚¹500.\n\nFor specific treatments:\nâ€¢ Dental Checkup: â‚¹500\nâ€¢ Eye Checkup: â‚¹500\nâ€¢ Root Canal: â‚¹2000 onwards\nâ€¢ Cataract Surgery: â‚¹25,000 onwards\n\nWould you like a detailed price list?"
     
     # Find best FAQ match
     faq_match = find_best_faq(message)

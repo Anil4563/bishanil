@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 
 class ContactInquiry(models.Model):
     """
@@ -74,9 +74,9 @@ class ClinicInfo(models.Model):
     whatsapp_number = models.CharField(max_length=20, default='+977 9800000000')
     
     # Email
-    email_primary = models.EmailField(default='info@shreekrishnadental.com')
-    email_support = models.EmailField(default='support@shreekrishnadental.com')
-    email_appointments = models.EmailField(default='appointments@shreekrishnadental.com')
+    email_primary = models.EmailField(default='info@bishanildental.com')
+    email_support = models.EmailField(default='support@bishanildental.com')
+    email_appointments = models.EmailField(default='appointments@bishanildental.com')
     
     # Social Media
     facebook = models.URLField(blank=True)
