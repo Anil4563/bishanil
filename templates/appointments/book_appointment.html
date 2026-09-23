@@ -29,7 +29,11 @@
                         </div>
                         <div class="form-field">
                             <label>Email *</label>
-                            <input type="email" name="patient_email" required placeholder="your@email.com">
+                            {% if user.is_authenticated %}
+    <input type="email" name="patient_email" value="{{ user.email }}" readonly required>
+{% else %}
+    <input type="email" name="patient_email" required placeholder="your@email.com">
+{% endif %}
                         </div>
                     </div>
                     <div class="form-row">

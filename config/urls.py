@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 from django.http import HttpResponse
 from django.contrib.sitemaps.views import sitemap
 from seo.simple_sitemap import SimpleSitemap
+from django.conf import settings
+from django.conf.urls.static import static
 
 sitemaps = {'pages': SimpleSitemap}
 

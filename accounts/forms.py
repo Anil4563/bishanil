@@ -36,6 +36,7 @@ class UserUpdateForm(forms.ModelForm):
         fields = ['username', 'first_name', 'last_name', 'email']
 
 class ProfileUpdateForm(forms.ModelForm):
+    phone = forms.CharField(required=False)
     class Meta:
         model = PatientProfile
         fields = ['phone', 'date_of_birth', 'blood_group', 'address', 'city', 

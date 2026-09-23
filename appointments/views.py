@@ -15,7 +15,7 @@ def book_appointment(request):
     if request.method == 'POST':
         # Get form data
         patient_name = request.POST.get('patient_name')
-        patient_email = request.POST.get('patient_email')
+        patient_email = request.user.email if request.user.is_authenticated else request.POST.get('patient_email')
         patient_phone = request.POST.get('patient_phone')
         patient_age = request.POST.get('patient_age')
         service_type = request.POST.get('service_type')
