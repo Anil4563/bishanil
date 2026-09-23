@@ -1,0 +1,120 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Manage Inquiries{% endblock %}
+{% block page_title %}Contact Inquiries{% endblock %}
+
+{% block content %}
+
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        <i class="fas fa-envelope" style="color: #26a69a;"></i> All Inquiries ({{ inquiries.count }})
+    </h3>
+
+    {% if inquiries %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Name</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Email</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Subject</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Date</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inq in inquiries %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <strong>{{ inq.name }}</strong><br>
+                    <small style="color: #6c757d;">{{ inq.phone }}</small>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <a href="mailto:{{ inq.email }}" style="color: #26a69a; text-decoration: none;">{{ inq.email }}</a>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <strong>{{ inq.subject|truncatechars:40 }}</strong><br>
+                    <small style="color: #6c757d;">{{ inq.get_inquiry_type_display }}</small>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <form method="POST" action="{% url 'dashboard:update_inquiry_status' inq.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 15px; font-size: 0.7rem; font-weight: 600; border: none; cursor: pointer;
+                            {% if inq.status == 'new' %}background: #fff3cd; color: #856404;
+                            {% elif inq.status == 'replied' %}background: #d4edda; color: #155724;
+                            {% elif inq.status == 'read' %}background: #cce5ff; color: #004085;
+                            {% else %}background: #e2e3e5; color: #383d41;{% endif %}">
+                            <option value="new" {% if inq.status == 'new' %}selected{% endif %}>New</option>
+                            <option value="read" {% if inq.status == 'read' %}selected{% endif %}>Read</option>
+                            <option value="replied" {% if inq.status == 'replied' %}selected{% endif %}>Replied</option>
+                            <option value="closed" {% if inq.status == 'closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                    </form>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ inq.created_at|date:"M d, Y" }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <button onclick="openReplyModal({{ inq.id }}, '{{ inq.name|escapejs }}', '{{ inq.email }}', '{{ inq.subject|escapejs }}', '{{ inq.message|escapejs }}')" style="background: #26a69a; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; margin-right: 3px;">
+                        <i class="fas fa-reply"></i> Reply
+                    </button>
+                    <a href="{% url 'dashboard:delete_inquiry' inq.id %}" onclick="return confirm('Delete this inquiry?');" style="background: #f44336; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">
+        <i class="fas fa-inbox" style="font-size: 3rem; display: block; margin-bottom: 15px; color: #dee2e6;"></i>
+        No inquiries yet
+    </p>
+    {% endif %}
+</div>
+
+<!-- REPLY MODAL -->
+<div id="replyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 700px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeReplyModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #26a69a; margin-bottom: 25px;"><i class="fas fa-reply"></i> Reply to Inquiry</h2>
+        
+        <!-- Original Message -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #26a69a;">
+            <p style="margin: 0 0 5px 0;"><strong>From:</strong> <span id="reply_from_name"></span> (<span id="reply_from_email"></span>)</p>
+            <p style="margin: 0 0 10px 0;"><strong>Subject:</strong> <span id="reply_subject"></span></p>
+            <hr style="border: none; border-top: 1px solid #e9ecef; margin: 10px 0;">
+            <p style="margin: 0; color: #495057; font-size: 0.9rem; white-space: pre-wrap;" id="reply_original_message"></p>
+        </div>
+        
+        <form method="POST" id="replyForm">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Your Reply Message *</label>
+                <textarea name="reply_message" id="reply_message" rows="8" required placeholder="Type your reply here..." style="width:100%;padding:12px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;font-size:0.95rem;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeReplyModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#26a69a,#1e847a);color:white;cursor:pointer;font-family:inherit;font-weight:600;">
+                    <i class="fas fa-paper-plane"></i> Send Reply
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openReplyModal(id, name, email, subject, message) {
+    document.getElementById('reply_from_name').textContent = name;
+    document.getElementById('reply_from_email').textContent = email;
+    document.getElementById('reply_subject').textContent = subject;
+    document.getElementById('reply_original_message').textContent = message;
+    document.getElementById('replyForm').action = '/admin-panel/inquiries/' + id + '/reply/';
+    document.getElementById('replyModal').style.display = 'block';
+}
+function closeReplyModal() {
+    document.getElementById('replyModal').style.display = 'none';
+}
+</script>
+
+{% endblock %}

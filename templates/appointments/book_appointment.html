@@ -1,0 +1,325 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Book Appointment - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Book <span>Appointment</span></h1>
+        <p>Schedule your consultation with our expert doctors</p>
+    </div>
+</section>
+
+<!-- Booking Form -->
+<section class="booking-form-section">
+    <div class="container">
+        <div class="form-wrapper">
+            <form method="POST" id="appointmentForm">
+                {% csrf_token %}
+                
+                <!-- Personal Information -->
+                <div class="form-group">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Full Name *</label>
+                            <input type="text" name="patient_name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-field">
+                            <label>Email *</label>
+                            <input type="email" name="patient_email" required placeholder="your@email.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Phone Number *</label>
+                            <input type="tel" name="patient_phone" required placeholder="98XXXXXXXX">
+                        </div>
+                        <div class="form-field">
+                            <label>Age</label>
+                            <input type="number" name="patient_age" placeholder="Your age">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Service Selection -->
+                <div class="form-group">
+                    <h3>Select Service</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Service Type *</label>
+                            <select name="service_type" id="serviceType" required>
+                                <option value="">Select Service Type</option>
+                                <option value="dental">Dental Service</option>
+                                <option value="eye">Eye Care Service</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Select Service *</label>
+                            <select name="service_id" id="serviceId" required>
+                                <option value="">First select service type</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Select Doctor *</label>
+                            <select name="doctor" id="doctorId" required>
+                                <option value="">Select a doctor</option>
+                                {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}" data-type="{{ doctor.specialization_type }}">
+                                    Dr. {{ doctor.name }} - {{ doctor.specialization }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date & Time -->
+                <div class="form-group">
+                    <h3>Select Date & Time</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Appointment Date *</label>
+                            <input type="date" name="appointment_date" id="appointmentDate" required min="{% now 'Y-m-d' %}">
+                        </div>
+                        <div class="form-field">
+                            <label>Appointment Time *</label>
+                            <select name="appointment_time" id="appointmentTime" required>
+                                <option value="">First select date</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Symptoms -->
+                <div class="form-group">
+                    <h3>Tell us about your problem</h3>
+                    <div class="form-field">
+                        <label>Symptoms / Reason for visit</label>
+                        <textarea name="symptoms" rows="4" placeholder="Describe your symptoms or reason for appointment..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Book Appointment</button>
+                    <a href="#" class="btn-secondary">Request Call Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .booking-form-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
+    
+    .form-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .form-group {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+    
+    .form-group h3 {
+        margin-bottom: 20px;
+        color: var(--teal);
+        font-size: 1.3rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-field label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--dark);
+    }
+    
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 12px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+    }
+    
+    .form-field textarea {
+        resize: vertical;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-wrapper {
+            padding: 25px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<script>
+    // Dental and Eye services data
+    const dentalServices = [
+        {% for service in dental_services %}
+        {id: {{ service.id }}, name: "{{ service.name }}" },
+        {% endfor %}
+    ];
+    
+    const eyeServices = [
+        {% for service in eye_services %}
+        {id: {{ service.id }}, name: "{{ service.name }}" },
+        {% endfor %}
+    ];
+    
+    // Service type change handler
+    document.getElementById('serviceType').addEventListener('change', function() {
+        const serviceType = this.value;
+        const serviceSelect = document.getElementById('serviceId');
+        serviceSelect.innerHTML = '<option value="">Select a service</option>';
+        
+        let services = [];
+        if (serviceType === 'dental') {
+            services = dentalServices;
+        } else if (serviceType === 'eye') {
+            services = eyeServices;
+        }
+        
+        services.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.id;
+            option.textContent = service.name;
+            serviceSelect.appendChild(option);
+        });
+    });
+    
+    // Doctor filter based on service type
+    document.getElementById('serviceType').addEventListener('change', function() {
+        const serviceType = this.value;
+        const doctorSelect = document.getElementById('doctorId');
+        const options = doctorSelect.options;
+        
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.value === '') continue;
+            
+            const doctorType = option.getAttribute('data-type');
+            if (serviceType === 'dental' && doctorType === 'dental') {
+                option.style.display = '';
+            } else if (serviceType === 'eye' && doctorType === 'eye') {
+                option.style.display = '';
+            } else if (serviceType === '') {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        }
+    });
+    
+    // Get available time slots - FIXED VERSION
+    document.getElementById('appointmentDate').addEventListener('change', function() {
+        const doctorId = document.getElementById('doctorId').value;
+        const date = this.value;
+        
+        console.log("Doctor ID:", doctorId);
+        console.log("Date:", date);
+        
+        if (doctorId && date) {
+            fetch(`/appointments/get-slots/?doctor_id=${doctorId}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Slots data:", data);
+                    const timeSelect = document.getElementById('appointmentTime');
+                    timeSelect.innerHTML = '<option value="">Select time slot</option>';
+                    
+                    if (data.slots && data.slots.length > 0) {
+                        data.slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot.start_time;
+                            option.textContent = `${slot.start_time} - ${slot.end_time} (${slot.available} slots available)`;
+                            timeSelect.appendChild(option);
+                        });
+                    } else {
+                        timeSelect.innerHTML = '<option value="">No slots available for this date</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching slots:", error);
+                    const timeSelect = document.getElementById('appointmentTime');
+                    timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+                });
+        }
+    });
+    
+    // Also trigger when doctor changes
+    document.getElementById('doctorId').addEventListener('change', function() {
+        const dateInput = document.getElementById('appointmentDate');
+        if (dateInput.value) {
+            // Trigger the date change event
+            const event = new Event('change');
+            dateInput.dispatchEvent(event);
+        }
+    });
+</script>
+{% endblock %}

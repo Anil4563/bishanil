@@ -1,0 +1,149 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ image.title }} - Bishanil Dental Gallery{% endblock %}
+
+{% block content %}
+<section class="image-detail-section">
+    <div class="container">
+        <div class="image-detail-container">
+            <div class="main-image">
+                {% if image.is_before_after and image.after_image %}
+                <img src="{{ image.after_image.url }}" alt="{{ image.title }}">
+                {% elif image.image %}
+                <img src="{{ image.image.url }}" alt="{{ image.title }}">
+                {% endif %}
+            </div>
+            
+            <div class="image-info">
+                <h1>{{ image.title }}</h1>
+                <p class="category"><i class="fas fa-folder"></i> {{ image.category.name }}</p>
+                <p class="description">{{ image.description|linebreaks }}</p>
+                
+                {% if image.is_before_after and image.before_image %}
+                <div class="before-after-info">
+                    <h3>Treatment Details</h3>
+                    <div class="compare-images">
+                        <div class="compare-before">
+                            <h4>Before</h4>
+                            <img src="{{ image.before_image.url }}" alt="Before treatment">
+                        </div>
+                        <div class="compare-after">
+                            <h4>After</h4>
+                            <img src="{{ image.after_image.url }}" alt="After treatment">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="image-meta">
+                    <p><i class="fas fa-calendar"></i> Added on: {{ image.date_added|date:"F d, Y" }}</p>
+                </div>
+                
+                <div class="navigation-buttons">
+                    {% if prev_id %}
+                    <a href="{% url 'gallery:image_detail' prev_id %}" class="btn-secondary">← Previous</a>
+                    {% endif %}
+                    {% if next_id %}
+                    <a href="{% url 'gallery:image_detail' next_id %}" class="btn-secondary">Next →</a>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'gallery:category_view' image.category.slug %}" class="btn-primary">Back to Gallery</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .image-detail-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
+    
+    .image-detail-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .main-image {
+        height: 500px;
+    }
+    
+    .main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .image-info {
+        padding: 30px;
+    }
+    
+    .image-info h1 {
+        margin-bottom: 15px;
+        color: var(--teal);
+    }
+    
+    .category {
+        color: var(--gray);
+        margin-bottom: 20px;
+    }
+    
+    .description {
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+    
+    .compare-images {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .compare-before h4, .compare-after h4 {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .compare-before img, .compare-after img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    
+    .image-meta {
+        padding: 15px 0;
+        border-top: 1px solid var(--gray-medium);
+        border-bottom: 1px solid var(--gray-medium);
+        margin: 20px 0;
+    }
+    
+    .navigation-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .image-detail-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .main-image {
+            height: 300px;
+        }
+        
+        .compare-images {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

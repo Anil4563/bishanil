@@ -1,0 +1,159 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Manage Services{% endblock %}
+{% block page_title %}Services{% endblock %}
+
+{% block content %}
+
+<!-- Dental Services -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px;">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        <i class="fas fa-tooth" style="color: #26a69a;"></i> Dental Services ({{ dental_services.count }})
+    </h3>
+
+    {% if dental_services %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Icon</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Name</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Type</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Price</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in dental_services %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <i class="{{ service.icon_class }}" style="font-size: 1.5rem; color: #26a69a;"></i>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><strong>{{ service.name }}</strong></td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ service.get_service_type_display }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if service.starting_price %}Rs. {{ service.starting_price }}{% else %}-{% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if service.is_active %}
+                    <span style="background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Active</span>
+                    {% else %}
+                    <span style="background: #f8d7da; color: #721c24; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Inactive</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <button onclick="openEditModal({{ service.id }}, '{{ service.name|escapejs }}', '{{ service.short_description|escapejs }}', '{{ service.full_description|escapejs }}', {{ service.starting_price|default:'null' }}, {{ service.is_active|yesno:'true,false' }}, 'dental')" style="background: #2196f3; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-edit"></i></button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No dental services yet.</p>
+    {% endif %}
+</div>
+
+<!-- Eye Care Services -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        <i class="fas fa-eye" style="color: #26a69a;"></i> Eye Care Services ({{ eye_services.count }})
+    </h3>
+
+    {% if eye_services %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Icon</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Name</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Type</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Price</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in eye_services %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <i class="{{ service.icon_class }}" style="font-size: 1.5rem; color: #26a69a;"></i>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><strong>{{ service.name }}</strong></td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ service.get_service_type_display }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if service.starting_price %}Rs. {{ service.starting_price }}{% else %}-{% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if service.is_active %}
+                    <span style="background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Active</span>
+                    {% else %}
+                    <span style="background: #f8d7da; color: #721c24; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Inactive</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <button onclick="openEditModal({{ service.id }}, '{{ service.name|escapejs }}', '{{ service.short_description|escapejs }}', '{{ service.full_description|escapejs }}', {{ service.starting_price|default:'null' }}, {{ service.is_active|yesno:'true,false' }}, 'eye')" style="background: #2196f3; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-edit"></i></button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No eye care services yet.</p>
+    {% endif %}
+</div>
+
+<!-- EDIT SERVICE MODAL -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 650px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeEditModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #2196f3; margin-bottom: 25px;"><i class="fas fa-edit"></i> Edit Service</h2>
+        <form method="POST" id="editForm">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Service Name *</label>
+                <input type="text" name="name" id="edit_name" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Short Description</label>
+                <textarea name="short_description" id="edit_short" rows="2" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Full Description</label>
+                <textarea name="full_description" id="edit_full" rows="5" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Starting Price (Rs.)</label>
+                    <input type="number" name="starting_price" id="edit_price" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding-top:25px;">
+                    <input type="checkbox" name="is_active" id="edit_active" style="width:18px;height:18px;">
+                    <label for="edit_active" style="font-weight:500;font-size:0.9rem;cursor:pointer;">Active</label>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeEditModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:#2196f3;color:white;cursor:pointer;font-family:inherit;font-weight:600;">Update Service</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditModal(id, name, shortDesc, fullDesc, price, isActive, type) {
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_short').value = shortDesc;
+    document.getElementById('edit_full').value = fullDesc;
+    document.getElementById('edit_price').value = price || '';
+    document.getElementById('edit_active').checked = isActive;
+    if (type === 'dental') {
+        document.getElementById('editForm').action = '/admin-panel/services/dental/' + id + '/edit/';
+    } else {
+        document.getElementById('editForm').action = '/admin-panel/services/eye/' + id + '/edit/';
+    }
+    document.getElementById('editModal').style.display = 'block';
+}
+function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+</script>
+
+{% endblock %}

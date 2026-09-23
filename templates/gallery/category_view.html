@@ -1,0 +1,355 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Bishanil Dental Gallery{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ category.name }}</h1>
+        <p>{{ category.description }}</p>
+    </div>
+</section>
+
+<!-- Before & After Section -->
+{% if before_after_images %}
+<section class="before-after-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Before & <span>After</span></h2>
+            <p>See the amazing transformations</p>
+        </div>
+        <div class="before-after-grid">
+            {% for image in before_after_images %}
+            <div class="ba-card" onclick="window.location.href='{% url 'gallery:image_detail' image.id %}'">
+                <div class="ba-images">
+                    <div class="ba-before">
+                        {% if image.before_image %}
+                        <img src="{{ image.before_image.url }}" alt="Before">
+                        {% else %}
+                        <img src="{{ image.image.url }}" alt="Before">
+                        {% endif %}
+                        <span class="ba-label">Before</span>
+                    </div>
+                    <div class="ba-after">
+                        <img src="{{ image.after_image.url }}" alt="After">
+                        <span class="ba-label">After</span>
+                    </div>
+                </div>
+                <h3>{{ image.title }}</h3>
+                <p>{{ image.description|truncatechars:100 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Regular Images -->
+{% if regular_images %}
+<section class="images-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{{ category.name }} <span>Gallery</span></h2>
+        </div>
+        <div class="images-grid">
+            {% for image in regular_images %}
+            <div class="gallery-item" onclick="window.location.href='{% url 'gallery:image_detail' image.id %}'">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}">
+                <div class="overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+                <div class="image-caption">
+                    <h4>{{ image.title }}</h4>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Videos -->
+{% if videos %}
+<section class="videos-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Video <span>Gallery</span></h2>
+        </div>
+        <div class="videos-grid">
+            {% for video in videos %}
+            <div class="video-card" data-video-url="{{ video.get_embed_url }}">
+                <div class="video-thumbnail">
+                    {% if video.thumbnail %}
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                    {% else %}
+                    <i class="fab fa-youtube"></i>
+                    {% endif %}
+                    <div class="play-btn"><i class="fas fa-play"></i></div>
+                </div>
+                <h3>{{ video.title }}</h3>
+                <p>{{ video.description|truncatechars:80 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .before-after-section, .images-section, .videos-section {
+        padding: 60px 0;
+    }
+    
+    .before-after-section {
+        background: var(--gray-light);
+    }
+    
+    .before-after-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+    }
+    
+    .ba-card {
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .ba-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .ba-images {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 250px;
+    }
+    
+    .ba-before, .ba-after {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ba-before img, .ba-after img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .ba-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: var(--white);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+    }
+    
+    .ba-card h3, .ba-card p {
+        padding: 15px;
+        margin: 0;
+    }
+    
+    .ba-card h3 {
+        padding-bottom: 5px;
+    }
+    
+    .images-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .gallery-item {
+        position: relative;
+        height: 280px;
+        border-radius: 15px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+    
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .gallery-item:hover .overlay {
+        opacity: 1;
+    }
+    
+    .overlay i {
+        font-size: 2rem;
+        color: var(--white);
+    }
+    
+    .image-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        padding: 15px;
+        transform: translateY(100%);
+        transition: transform 0.3s;
+    }
+    
+    .gallery-item:hover .image-caption {
+        transform: translateY(0);
+    }
+    
+    .image-caption h4 {
+        color: var(--white);
+        font-size: 0.9rem;
+    }
+    
+    .videos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    .video-card {
+        background: var(--white);
+        border-radius: 15px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .video-thumbnail {
+        position: relative;
+        height: 200px;
+        background: var(--dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .video-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .video-thumbnail i {
+        font-size: 4rem;
+        color: #ff0000;
+    }
+    
+    .play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .play-btn i {
+        font-size: 1.5rem;
+        color: var(--teal);
+        margin-left: 5px;
+    }
+    
+    .video-card h3, .video-card p {
+        padding: 0 15px;
+    }
+    
+    .video-card h3 {
+        margin: 15px 0 10px;
+    }
+    
+    .video-card p {
+        margin-bottom: 15px;
+        color: var(--gray);
+    }
+    
+    @media (max-width: 768px) {
+        .before-after-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    const modal = document.createElement('div');
+    modal.className = 'video-modal';
+    modal.innerHTML = `
+        <div class="video-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="video-container">
+                <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    const videoFrame = document.getElementById('videoFrame');
+    const closeModal = modal.querySelector('.close-modal');
+    
+    document.querySelectorAll('.video-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const videoUrl = card.getAttribute('data-video-url');
+            videoFrame.src = videoUrl;
+            modal.style.display = 'block';
+        });
+    });
+    
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        videoFrame.src = '';
+    });
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            videoFrame.src = '';
+        }
+    });
+</script>
+{% endblock %}

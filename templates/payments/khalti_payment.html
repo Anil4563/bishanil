@@ -1,0 +1,179 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Khalti Payment - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="payment-section">
+    <div class="container">
+        <div class="payment-card">
+            <div class="payment-header">
+                <img src="https://khalti.com/static/images/logo.png" alt="Khalti" class="khalti-logo">
+                <h2>Payment Details</h2>
+            </div>
+            
+            <div class="payment-details">
+                <div class="detail-row">
+                    <span>Transaction ID:</span>
+                    <strong>{{ transaction.transaction_id }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Patient Name:</span>
+                    <strong>{{ transaction.patient_name }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Service:</span>
+                    <strong>{{ transaction.service_name|default:"Consultation Fee" }}</strong>
+                </div>
+                <div class="detail-row amount">
+                    <span>Amount:</span>
+                    <strong>Rs. {{ transaction.amount }}</strong>
+                </div>
+            </div>
+            
+            <div id="khalti-payment" class="khalti-container">
+                <button id="payment-button" class="btn-primary">Pay with Khalti</button>
+            </div>
+            
+            <div class="payment-info">
+                <i class="fas fa-shield-alt"></i>
+                <p>Your payment is secure with Khalti. We accept eSewa, Connect IPS, and all major banks.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .payment-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .payment-card {
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+    }
+    
+    .khalti-logo {
+        height: 60px;
+        margin-bottom: 20px;
+    }
+    
+    .payment-header h2 {
+        color: var(--teal);
+        margin-bottom: 30px;
+    }
+    
+    .payment-details {
+        background: var(--gray-light);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-row.amount {
+        font-size: 1.2rem;
+        color: var(--teal);
+    }
+    
+    .khalti-container {
+        margin: 20px 0;
+    }
+    
+    .payment-info {
+        background: var(--teal-bg);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .payment-info i {
+        font-size: 1.2rem;
+        color: var(--teal);
+    }
+</style>
+
+<script src="https://khalti.s3.ap-south-1.amazonaws.com/KPG/dist/2020.12.17.0.0.0/khalti-checkout.iffe.js"></script>
+<script>
+    var config = {
+        "publicKey": "{{ khalti_public_key }}",
+        "productIdentity": "{{ transaction.transaction_id }}",
+        "productName": "{{ transaction.service_name|default:'Consultation Fee' }}",
+        "productUrl": "http://127.0.0.1:8000/",
+        "eventHandler": {
+            onSuccess(payload) {
+                console.log(payload);
+                // Verify payment
+                fetch(`/payments/khalti/verify/{{ transaction.transaction_id }}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        token: payload.token,
+                        amount: payload.amount
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = `/payments/khalti/success/?transaction_id={{ transaction.transaction_id }}`;
+                    } else {
+                        window.location.href = `/payments/khalti/failure/`;
+                    }
+                });
+            },
+            onError(error) {
+                console.log(error);
+                window.location.href = `/payments/khalti/failure/`;
+            }
+        }
+    };
+    
+    var checkout = new KhaltiCheckout(config);
+    var btn = document.getElementById("payment-button");
+    btn.onclick = function () {
+        checkout.show({amount: {{ transaction.amount }}00});
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

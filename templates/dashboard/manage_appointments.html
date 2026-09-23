@@ -1,0 +1,383 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Manage Appointments{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 style="color: #212529; margin: 0;"><i class="fas fa-calendar-alt" style="color: #26a69a;"></i> Appointments</h2>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        {% if model_info.success %}
+        <span style="background: #e0f7fa; color: #006064; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-brain"></i>
+            AI Model: {{ model_info.accuracy }}% accuracy ({{ model_info.samples }} samples)
+        </span>
+        {% else %}
+        <span style="background: #fff3cd; color: #856404; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-exclamation-triangle"></i> AI needs more data ({{ model_info.samples|default:0 }} samples)
+        </span>
+        {% endif %}
+        <a href="{% url 'dashboard:reminder_logs' %}" style="background: #9c27b0; color: white; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-history"></i> Reminder Logs
+        </a>
+        <button onclick="openAddModal()" style="background: linear-gradient(135deg, #26a69a, #1e847a); color: white; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 0.9rem;">
+            <i class="fas fa-plus"></i> Add Appointment
+        </button>
+    </div>
+</div>
+
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; flex-wrap: wrap; gap: 15px;">
+        <h3 style="margin: 0;">All Appointments ({{ appointments|length }})</h3>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="?status=" style="padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500; background: {% if not status_filter %}#26a69a{% else %}#f0f0f0{% endif %}; color: {% if not status_filter %}white{% else %}#495057{% endif %};">All</a>
+            <a href="?status=pending" style="padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500; background: {% if status_filter == 'pending' %}#ff9800{% else %}#f0f0f0{% endif %}; color: {% if status_filter == 'pending' %}white{% else %}#495057{% endif %};">Pending</a>
+            <a href="?status=confirmed" style="padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500; background: {% if status_filter == 'confirmed' %}#4caf50{% else %}#f0f0f0{% endif %}; color: {% if status_filter == 'confirmed' %}white{% else %}#495057{% endif %};">Confirmed</a>
+            <a href="?status=completed" style="padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500; background: {% if status_filter == 'completed' %}#2196f3{% else %}#f0f0f0{% endif %}; color: {% if status_filter == 'completed' %}white{% else %}#495057{% endif %};">Completed</a>
+        </div>
+    </div>
+
+    {% if appointments %}
+    <div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Patient</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Phone</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Date</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Time</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Doctor</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">AI Prediction</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for apt in appointments %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><strong>{{ apt.patient_name }}</strong></td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.patient_phone }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.appointment_date }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.appointment_time|time:"g:i A" }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{% if apt.doctor %}Dr. {{ apt.doctor.name }}{% else %}-{% endif %}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                        {% if apt.status == 'completed' %}background: #d4edda; color: #155724;
+                        {% elif apt.status == 'pending' %}background: #fff3cd; color: #856404;
+                        {% elif apt.status == 'cancelled' %}background: #f8d7da; color: #721c24;
+                        {% else %}background: #cce5ff; color: #004085;{% endif %}">
+                        {{ apt.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if apt.no_show_prediction.model_ready %}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="position: relative; width: 45px; height: 45px; flex-shrink: 0;">
+                                <svg width="45" height="45" viewBox="0 0 45 45" style="transform: rotate(-90deg);">
+                                    <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="#e9ecef" stroke-width="4"></circle>
+                                    <circle cx="22.5" cy="22.5" r="18" fill="none"
+                                        stroke="{% if apt.no_show_prediction.risk_color == 'success' %}#4caf50{% elif apt.no_show_prediction.risk_color == 'warning' %}#ff9800{% else %}#f44336{% endif %}"
+                                        stroke-width="4"
+                                        stroke-dasharray="113"
+                                        stroke-dashoffset="{{ apt.no_show_prediction.probability }}"
+                                        stroke-linecap="round">
+                                    </circle>
+                                </svg>
+                                <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.68rem; font-weight: 800; color: #212529;">
+                                    {{ apt.no_show_prediction.probability }}%
+                                </span>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+                                    {% if apt.no_show_prediction.risk_color == 'success' %}color: #4caf50;
+                                    {% elif apt.no_show_prediction.risk_color == 'warning' %}color: #ff9800;
+                                    {% else %}color: #f44336;{% endif %}">
+                                    {{ apt.no_show_prediction.risk_level }} Risk
+                                </span>
+                                <small style="font-size: 0.65rem; color: #6c757d;">{{ apt.no_show_prediction.message|truncatechars:30 }}</small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <small style="color: #6c757d;">{{ apt.no_show_prediction.message }}</small>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <button onclick="openReminderModal({{ apt.id }}, '{{ apt.patient_name|escapejs }}', '{{ apt.patient_email }}', '{{ apt.appointment_date|date:'D, d M Y' }}', '{{ apt.appointment_time|time:'g:i A' }}', '{{ apt.no_show_prediction.risk_level|default:'medium' }}', {{ apt.no_show_prediction.probability|default:0 }})" style="background: #ff9800; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; margin-right: 3px;" title="Send AI reminder">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button onclick="openEditModal({{ apt.id }}, '{{ apt.patient_name|escapejs }}', '{{ apt.patient_email }}', '{{ apt.patient_phone }}', '{{ apt.appointment_date|date:"Y-m-d" }}', '{{ apt.appointment_time|time:"H:i" }}', '{{ apt.status }}', '{{ apt.symptoms|escapejs }}', {% if apt.doctor %}{{ apt.doctor.id }}{% else %}null{% endif %})" style="background: #2196f3; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; margin-right: 3px;"><i class="fas fa-edit"></i></button>
+                    <a href="{% url 'dashboard:delete_appointment' apt.id %}" onclick="return confirm('Delete this appointment?');" style="background: #f44336; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem;"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No appointments found.</p>
+    {% endif %}
+</div>
+
+<!-- ADD APPOINTMENT MODAL -->
+<div id="addModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 650px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeAddModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #26a69a; margin-bottom: 25px;"><i class="fas fa-plus-circle"></i> New Appointment</h2>
+        <form method="POST" action="{% url 'dashboard:add_appointment' %}">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Patient Name *</label><input type="text" name="patient_name" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Email *</label><input type="email" name="patient_email" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Phone *</label><input type="tel" name="patient_phone" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Age</label><input type="number" name="patient_age" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Service Type *</label>
+                    <select name="service_type" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="dental">Dental</option>
+                        <option value="eye">Eye</option>
+                    </select>
+                </div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Doctor *</label>
+                    <select name="doctor" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        {% for d in doctors %}<option value="{{ d.id }}">Dr. {{ d.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Date *</label><input type="date" name="appointment_date" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Time *</label><input type="time" name="appointment_time" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div style="grid-column:span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Symptoms</label><textarea name="symptoms" rows="2" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeAddModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#26a69a,#1e847a);color:white;cursor:pointer;font-family:inherit;font-weight:600;">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT APPOINTMENT MODAL -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 650px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeEditModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #2196f3; margin-bottom: 25px;"><i class="fas fa-edit"></i> Edit Appointment</h2>
+        <form method="POST" id="editForm">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Patient Name</label><input type="text" name="patient_name" id="edit_name" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Email</label><input type="email" name="patient_email" id="edit_email" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Phone</label><input type="tel" name="patient_phone" id="edit_phone" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Date</label><input type="date" name="appointment_date" id="edit_date" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Time</label><input type="time" name="appointment_time" id="edit_time" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Status</label>
+                    <select name="status" id="edit_status" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div style="grid-column:span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Doctor</label>
+                    <select name="doctor" id="edit_doctor" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        {% for d in doctors %}<option value="{{ d.id }}">Dr. {{ d.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div style="grid-column:span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Symptoms</label><textarea name="symptoms" id="edit_symptoms" rows="2" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeEditModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:#2196f3;color:white;cursor:pointer;font-family:inherit;font-weight:600;">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- REMINDER MODAL -->
+<div id="reminderModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2100; overflow-y: auto;">
+    <div style="max-width: 700px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeReminderModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+            <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #ff9800, #e65100); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.6rem;">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div>
+                <h2 style="margin: 0; color: #ff9800;">Send AI Reminder</h2>
+                <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 0.9rem;">
+                    Personalized reminder based on no-show risk
+                </p>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 18px 20px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <small style="color: #6c757d; font-size: 0.7rem; text-transform: uppercase;">Patient</small>
+                    <p id="reminder_patient_name" style="margin: 3px 0 0 0; font-weight: 600; color: #212529;"></p>
+                </div>
+                <div>
+                    <small style="color: #6c757d; font-size: 0.7rem; text-transform: uppercase;">Email</small>
+                    <p id="reminder_patient_email" style="margin: 3px 0 0 0; font-weight: 500; color: #212529; font-size: 0.85rem;"></p>
+                </div>
+                <div>
+                    <small style="color: #6c757d; font-size: 0.7rem; text-transform: uppercase;">Date</small>
+                    <p id="reminder_date" style="margin: 3px 0 0 0; font-weight: 500; color: #212529;"></p>
+                </div>
+                <div>
+                    <small style="color: #6c757d; font-size: 0.7rem; text-transform: uppercase;">Time</small>
+                    <p id="reminder_time" style="margin: 3px 0 0 0; font-weight: 500; color: #212529;"></p>
+                </div>
+            </div>
+
+            <div id="reminder_risk_box" style="margin-top: 15px; padding: 12px 15px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-brain" style="font-size: 1.3rem;"></i>
+                <div style="flex: 1;">
+                    <div id="reminder_risk_label" style="font-weight: 700; font-size: 0.9rem;"></div>
+                    <div id="reminder_risk_message" style="font-size: 0.75rem; opacity: 0.85;"></div>
+                </div>
+                <div id="reminder_risk_prob" style="font-size: 1.3rem; font-weight: 800;"></div>
+            </div>
+        </div>
+
+        <form method="POST" id="reminderForm">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 0.85rem; display: block; margin-bottom: 6px;">Reminder Type</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">
+                        <input type="radio" name="reminder_type" value="email" checked> 📧 Email
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">
+                        <input type="radio" name="reminder_type" value="sms"> 📱 SMS
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">
+                        <input type="radio" name="reminder_type" value="phone"> 📞 Phone Call
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">
+                        <input type="radio" name="reminder_type" value="whatsapp"> 💬 WhatsApp
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-weight: 500; font-size: 0.85rem;">Message <span style="color: #6c757d; font-weight: 400; font-size: 0.75rem;">(AI-generated — you can edit)</span></label>
+                    <button type="button" onclick="regenerateMessage()" style="background: #e0f7fa; color: #006064; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; font-family: inherit;">
+                        <i class="fas fa-sync"></i> Regenerate
+                    </button>
+                </div>
+                <textarea name="message" id="reminder_message" rows="12" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px; font-family: monospace; font-size: 0.85rem; line-height: 1.5;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeReminderModal()" style="padding: 12px 24px; border-radius: 10px; border: none; background: #e9ecef; cursor: pointer; font-family: inherit;">
+                    Cancel
+                </button>
+                <button type="submit" style="padding: 12px 24px; border-radius: 10px; border: none; background: linear-gradient(135deg, #ff9800, #e65100); color: white; cursor: pointer; font-family: inherit; font-weight: 600;">
+                    <i class="fas fa-paper-plane"></i> Send Reminder
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddModal() { document.getElementById('addModal').style.display = 'block'; }
+function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+
+function openEditModal(id, name, email, phone, date, time, status, symptoms, doctorId) {
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_phone').value = phone;
+    document.getElementById('edit_date').value = date;
+    document.getElementById('edit_time').value = time;
+    document.getElementById('edit_status').value = status;
+    document.getElementById('edit_symptoms').value = symptoms;
+    if (doctorId) document.getElementById('edit_doctor').value = doctorId;
+    document.getElementById('editForm').action = '/admin-panel/appointments/' + id + '/edit/';
+    document.getElementById('editModal').style.display = 'block';
+}
+function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+
+// ============================================
+// REMINDER SYSTEM
+// ============================================
+let currentReminderData = {};
+
+function openReminderModal(id, name, email, date, time, riskLevel, probability) {
+    currentReminderData = {
+        id: id, name: name, email: email, date: date, time: time,
+        riskLevel: riskLevel || 'medium', probability: probability || 0
+    };
+
+    document.getElementById('reminder_patient_name').textContent = name;
+    document.getElementById('reminder_patient_email').textContent = email;
+    document.getElementById('reminder_date').textContent = date;
+    document.getElementById('reminder_time').textContent = time;
+
+    const box = document.getElementById('reminder_risk_box');
+    const label = document.getElementById('reminder_risk_label');
+    const msg = document.getElementById('reminder_risk_message');
+    const prob = document.getElementById('reminder_risk_prob');
+
+    prob.textContent = currentReminderData.probability + '%';
+
+    if (riskLevel === 'high') {
+        box.style.background = '#f8d7da';
+        box.style.color = '#721c24';
+        label.textContent = 'HIGH RISK';
+        msg.textContent = 'Likely to skip — send urgent reminder';
+    } else if (riskLevel === 'low') {
+        box.style.background = '#d4edda';
+        box.style.color = '#155724';
+        label.textContent = 'LOW RISK';
+        msg.textContent = 'Likely to attend — friendly reminder';
+    } else {
+        box.style.background = '#fff3cd';
+        box.style.color = '#856404';
+        label.textContent = 'MEDIUM RISK';
+        msg.textContent = 'Might skip — gentle reminder recommended';
+    }
+
+    document.getElementById('reminder_message').value = generateAIMessage(
+        currentReminderData.riskLevel,
+        name.split(' ')[0],
+        date,
+        time
+    );
+
+    document.getElementById('reminderForm').action = '/admin-panel/appointments/' + id + '/send-reminder/';
+    document.getElementById('reminderModal').style.display = 'block';
+}
+
+function closeReminderModal() {
+    document.getElementById('reminderModal').style.display = 'none';
+}
+
+function generateAIMessage(riskLevel, firstName, date, time) {
+    const clinicName = 'Bishanil Dental & Eye Care';
+    const clinicPhone = '+977 9800000000';
+    const clinicAddress = 'Putalisadak, Kathmandu';
+
+    if (riskLevel === 'high') {
+        return 'Dear ' + firstName + ',\n\nURGENT REMINDER\n\nYour appointment is scheduled for:\nDate: ' + date + '\nTime: ' + time + '\n\nWe noticed you may have missed appointments before. This is a friendly but important reminder.\n\nTo confirm your appointment, please:\nCall us: ' + clinicPhone + '\nWhatsApp: ' + clinicPhone + '\n\nIf you cannot attend, please let us know at least 24 hours in advance so we can reschedule.\n\nYour health is important — we look forward to seeing you!\n\nWarm regards,\n' + clinicName + '\n' + clinicAddress;
+    } else if (riskLevel === 'low') {
+        return 'Dear ' + firstName + ',\n\nLooking forward to seeing you!\n\nDate: ' + date + '\nTime: ' + time + '\n\nTips for your visit:\n- Bring your ID and any previous reports\n- Arrive 10 minutes early\n- Stay hydrated\n\nAny questions? Call us at ' + clinicPhone + '.\n\nWarm regards,\n' + clinicName;
+    } else {
+        return 'Dear ' + firstName + ',\n\nThis is a friendly reminder about your upcoming appointment:\n\nDate: ' + date + '\nTime: ' + time + '\n\nPlease arrive 10 minutes before your scheduled time.\n\nTo confirm or reschedule, call us at ' + clinicPhone + '.\n\nSee you soon!\n\nBest regards,\n' + clinicName + '\n' + clinicAddress;
+    }
+}
+
+function regenerateMessage() {
+    const msg = generateAIMessage(
+        currentReminderData.riskLevel,
+        currentReminderData.name.split(' ')[0],
+        currentReminderData.date,
+        currentReminderData.time
+    );
+    document.getElementById('reminder_message').value = msg;
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,1125 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block title %}Home - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-wrapper">
+            <div class="hero-content">
+                <span class="hero-badge">🦷 Welcome to Bishanil Dental & Eye Care</span>
+                <h1>Your Smile, <span>Our Vision</span></h1>
+                <p>Complete Dental & Eye Care solutions under one roof. Advanced technology, affordable prices, and
+                    compassionate care for your entire family.</p>
+                <div class="hero-buttons">
+                    {% if user.is_authenticated %}
+                    <a href="/appointments/book/" class="btn-primary">Book Appointment</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn-primary"><i class="fas fa-calendar-check"></i> Book
+                        Appointment</a>
+                    {% endif %}
+
+                    <a href="#services" class="btn-secondary"><i class="fas fa-play"></i> Our Services</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <i class="fas fa-smile"></i>
+                        <div class="stat-info">
+                            <h4>5000+</h4>
+                            <p>Happy Patients</p>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-user-md"></i>
+                        <div class="stat-info">
+                            <h4>15+</h4>
+                            <p>Expert Doctors</p>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-info">
+                            <h4>10+</h4>
+                            <p>Years Experience</p>
+                        </div>
+                    </div>
+                    <!-- <div class="stat">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-info">
+                            <h4>4.9</h4>
+                            <p>Patient Rating</p>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-placeholder">
+                    <!-- Replace this image with your actual hero image -->
+                    <img src="{% static 'images/image1.png' %}" alt="Dental Clinic"
+                        onerror="this.src='https://placehold.co/600x500/26a69a/white?text=Dental+%26+Eye+Care'">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="floating-card floating-card-1">
+                    <i class="fas fa-star"></i>
+                    <span>5.0 Rated Clinic</span>
+                </div>
+                <div class="floating-card floating-card-2">
+                    <i class="fas fa-clock"></i>
+                    <span>9AM - 8PM</span>
+                </div>
+                <div class="floating-card floating-card-3">
+                    <i class="fas fa-ambulance"></i>
+                    <span>24/7 Emergency</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services" id="services">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our <span>Services</span></h2>
+            <p>Comprehensive dental and eye care services tailored for you</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-tooth"></i>
+                </div>
+                <h3>General Dentistry</h3>
+                <p>Regular checkups, cleanings, fillings, and preventive care for healthy teeth.</p>
+                <a href="/dental/services/general-dentistry/" class="service-link">Learn More →</a>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h3>Cosmetic Dentistry</h3>
+                <p>Teeth whitening, veneers, and smile makeovers for your perfect smile.</p>
+                <a href="/dental/services/cosmetic-dentistry/" class="service-link">Learn More →</a>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-teeth"></i>
+                </div>
+                <h3>Dental Implants</h3>
+                <p>Permanent solution for missing teeth with advanced implant technology.</p>
+                <a href="/dental/services/dental-implants/" class="service-link">Learn More →</a>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3>Cataract Surgery</h3>
+                <p>Advanced cataract removal with premium lens implants for clear vision.</p>
+                <a href="/eyecare/services/cataract-surgery/" class="service-link">Learn More →</a>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-glasses"></i>
+                </div>
+                <h3>LASIK</h3>
+                <p>Bladeless laser vision correction for freedom from glasses and contacts.</p>
+                <a href="/eyecare/services/lasik-vision-correction/" class="service-link">Learn More →</a>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-child"></i>
+                </div>
+                <h3>Pediatric Care</h3>
+                <p>Specialized dental and eye care for children in a friendly environment.</p>
+                <a href="#" class="service-link">Learn More →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features/Why Choose Us -->
+<section class="why-choose-us">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why <span>Choose Us?</span></h2>
+            <p>What makes us the preferred choice for dental and eye care</p>
+        </div>
+        <div class="features-grid">
+            {% for feature in features %}
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="{{ feature.icon_class }}"></i>
+                    <span class="feature-number">{{ forloop.counter }}</span>
+                </div>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- About Preview Section -->
+<section class="about-section">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-image">
+                {% if about_us and about_us.image %}
+                <img src="{{ about_us.image.url }}" alt="{{ about_us.title }}" class="about-img">
+                {% else %}
+                <div class="about-image-placeholder">
+                    <img src="{% static 'images/about.png' %}" alt="About Us"
+                        onerror="this.src='https://placehold.co/600x500/26a69a/white?text=About+Us'">
+                </div>
+                {% endif %}
+            </div>
+            <div class="about-content">
+                <h2>About <span>Us</span></h2>
+                {% if about_us and about_us.description %}
+                <p>{{ about_us.description|linebreaks }}</p>
+                {% else %}
+                <p>Founded with a vision to provide comprehensive dental and eye care under one roof, Bishanil
+                    Dental & Eye Care has been serving the community with dedication and excellence.</p>
+                {% endif %}
+
+                <ul class="about-features">
+                    {% if about_us and about_us.features %}
+                    {% for feature in about_us.features %}
+                    <li><i class="fas fa-check-circle"></i> {{ feature }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <li><i class="fas fa-check-circle"></i> 5000+ Successful Treatments</li>
+                    <li><i class="fas fa-check-circle"></i> ISO Certified Clinic</li>
+                    <li><i class="fas fa-check-circle"></i> Advanced Diagnostic Equipment</li>
+                    <li><i class="fas fa-check-circle"></i> Experienced Medical Team</li>
+                    {% endif %}
+                </ul>
+                <a href="#" class="btn-primary">Learn More About Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI TOP RATED DOCTORS -->
+<section class="top-doctors-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="ai-badge">
+                <i class="fas fa-brain"></i> AI Powered
+            </span>
+            <h2>Top Rated <span>Doctors</span></h2>
+            <p>Recommended by our intelligent ranking system based on patient ratings, experience, and demand</p>
+        </div>
+
+        <div class="top-doctors-grid">
+            {% for item in top_doctors %}
+            <div class="top-doctor-card">
+                <!-- Rank Badge -->
+                <div class="rank-badge rank-{{ forloop.counter }}">
+                    {% if forloop.counter == 1 %}🏆 #1{% elif forloop.counter == 2 %}🥈 #2{% else %}🥉 #3{% endif %}
+                </div>
+                
+                <!-- Doctor Image -->
+                <div class="top-doctor-image">
+                    {% if item.doctor.profile_image %}
+                    <img src="{{ item.doctor.profile_image.url }}" alt="{{ item.doctor.name }}">
+                    {% else %}
+                    <i class="fas fa-user-md"></i>
+                    {% endif %}
+                </div>
+                
+                <!-- Doctor Info -->
+                <h3>Dr. {{ item.doctor.name }}</h3>
+                <p class="specialty">{{ item.doctor.specialization }}</p>
+                
+                <!-- Stats -->
+                <div class="doctor-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                        <span>{{ item.avg_rating|default:"0" }}/5</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-briefcase" style="color: #26a69a;"></i>
+                        <span>{{ item.doctor.experience_years }} yrs</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-check" style="color: #2196f3;"></i>
+                        <span>{{ item.total_appointments }} visits</span>
+                    </div>
+                </div>
+                
+                <!-- AI Score -->
+                <div class="ai-score">
+                    <div class="score-label">
+                        <i class="fas fa-chart-line"></i>
+                        AI Score
+                    </div>
+                    <div class="score-value">{{ item.score }}</div>
+                </div>
+                
+                <!-- Action -->
+                <a href="{% url 'doctors:doctor_detail' item.doctor.slug %}" class="view-doctor-btn">
+                    View Profile <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% empty %}
+            <p style="text-align: center; width: 100%; color: #6c757d; padding: 40px;">
+                No doctors available yet.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- Doctors Section - Modern Design -->
+<section class="doctors-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Meet Our <span>Expert Doctors</span></h2>
+            <p>Highly qualified specialists dedicated to your health</p>
+        </div>
+        <div class="doctors-container">
+            <div class="doctors-slider">
+                {% for doctor in doctors %}
+                <div class="doctor-card-modern">
+                    <div class="doctor-card-inner">
+                        <div class="doctor-avatar">
+                            {% if doctor.profile_image %}
+                            <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                            {% else %}
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            {% endif %}
+                            <div class="doctor-social-overlay">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>{{ doctor.name }}</h3>
+                            <p class="doctor-title">{{ doctor.specialization }}</p>
+                            <div class="doctor-badge">
+                                <span class="badge-experience">{{ doctor.experience_years }}+ Years</span>
+                                <span class="badge-fee">₹{{ doctor.consultation_fee }}</span>
+                            </div>
+                            <div class="doctor-qualification">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ doctor.get_degree_display }}</span>
+                            </div>
+                            <a href="{% url 'doctors:doctor_detail' doctor.slug %}" class="view-profile-btn">
+                                View Profile <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Sample doctors for demo -->
+                <div class="doctor-card-modern">
+                    <div class="doctor-card-inner">
+                        <div class="doctor-avatar">
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Rajesh Thapa</h3>
+                            <p class="doctor-title">Orthodontist & Implantologist</p>
+                            <div class="doctor-badge">
+                                <span class="badge-experience">12+ Years</span>
+                                <span class="badge-fee">₹800</span>
+                            </div>
+                            <div class="doctor-qualification">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>MDS</span>
+                            </div>
+                            <a href="#" class="view-profile-btn">View Profile <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="doctor-card-modern">
+                    <div class="doctor-card-inner">
+                        <div class="doctor-avatar">
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Sunita Sharma</h3>
+                            <p class="doctor-title">Cataract & LASIK Surgeon</p>
+                            <div class="doctor-badge">
+                                <span class="badge-experience">10+ Years</span>
+                                <span class="badge-fee">₹1000</span>
+                            </div>
+                            <div class="doctor-qualification">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>MS</span>
+                            </div>
+                            <a href="#" class="view-profile-btn">View Profile <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="doctor-card-modern">
+                    <div class="doctor-card-inner">
+                        <div class="doctor-avatar">
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Krishna Prasad</h3>
+                            <p class="doctor-title">General Dentist & Endodontist</p>
+                            <div class="doctor-badge">
+                                <span class="badge-experience">15+ Years</span>
+                                <span class="badge-fee">₹500</span>
+                            </div>
+                            <div class="doctor-qualification">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>BDS</span>
+                            </div>
+                            <a href="#" class="view-profile-btn">View Profile <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="doctors-footer">
+            <a href="/doctors/" class="view-all-doctors">
+                View All Doctors <i class="fas fa-long-arrow-alt-right"></i>
+            </a>
+        </div>
+    </div>
+    </div>
+</section>
+
+<!-- Testimonials Section
+<section class="testimonials">
+    <div class="container">
+        <div class="section-header">
+            <h2>What Our <span>Patients Say</span></h2>
+            <p>Real stories from our satisfied patients</p>
+        </div>
+        <div class="testimonials-grid">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= testimonial.rating %} <i class="fas fa-star"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+                <p class="testimonial-text">"{{ testimonial.testimonial_text }}"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        {% if testimonial.patient_image %}
+                        <img src="{{ testimonial.patient_image.url }}" alt="{{ testimonial.patient_name }}">
+                        {% else %}
+                        <span>{{ testimonial.patient_name|slice:":2"|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <h4>{{ testimonial.patient_name }}</h4>
+                        {% if testimonial.patient_location %}
+                        <p>{{ testimonial.patient_location }}</p>
+                        {% endif %}
+                        {% if testimonial.treatment %}
+                        <small>{{ testimonial.treatment }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"Excellent service! The doctors are very professional and caring. I got my
+                    root canal treatment done here and it was painless. Highly recommended!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">RP</div>
+                    <div class="author-info">
+                        <h4>Ram Prasad</h4>
+                        <p>Kathmandu</p>
+                        <small>Dental Patient</small>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"I had my cataract surgery here. The results are amazing! My vision is
+                    crystal clear now. The staff is very supportive."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SG</div>
+                    <div class="author-info">
+                        <h4>Sita Gurung</h4>
+                        <p>Pokhara</p>
+                        <small>Cataract Surgery</small>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"The best dental clinic in town! Very clean environment, modern equipment,
+                    and friendly doctors. My whole family comes here."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">BP</div>
+                    <div class="author-info">
+                        <h4>Bikash Pokhrel</h4>
+                        <p>Butwal</p>
+                        <small>Regular Patient</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section> -->
+
+<!-- Patient Feedback Section -->
+<section class="feedback-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>What Our <span>Patients Say</span></h2>
+            <p>Real feedback from real patients</p>
+        </div>
+        
+        <div class="feedback-tabs">
+            <button class="tab-btn active" onclick="showTab('clinic')">Clinic Feedback</button>
+            <button class="tab-btn" onclick="showTab('doctor')">Doctor Feedback</button>
+        </div>
+        
+        <!-- Clinic Feedback Tab -->
+        <div id="clinic-feedback" class="feedback-tab active">
+            <div class="feedback-grid">
+                {% for feedback in clinic_feedbacks %}
+                <div class="feedback-card">
+                    <div class="feedback-rating">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= feedback.rating %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="feedback-text">"{{ feedback.feedback_text|truncatechars:150 }}"</p>
+                    <div class="feedback-author">
+                        <div class="author-initial">{{ feedback.name|slice:":1"|upper }}</div>
+                        <div class="author-details">
+                            <h4>{{ feedback.name }}</h4>
+                            {% if feedback.topic %}
+                            <small>On: {{ feedback.topic }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if feedback.admin_response %}
+                    <div class="admin-response">
+                        <i class="fas fa-reply"></i>
+                        <p><strong>Clinic Response:</strong> {{ feedback.admin_response|truncatechars:100 }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="no-feedback">
+                    <p>No clinic feedback yet. Be the first to share your experience!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Doctor Feedback Tab -->
+        <div id="doctor-feedback" class="feedback-tab">
+            <div class="feedback-grid">
+                {% for feedback in doctor_feedbacks %}
+                <div class="feedback-card">
+                    <div class="feedback-rating">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= feedback.rating %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="feedback-text">"{{ feedback.feedback_text|truncatechars:150 }}"</p>
+                    <div class="feedback-author">
+                        <div class="author-initial">{{ feedback.name|slice:":1"|upper }}</div>
+                        <div class="author-details">
+                            <h4>{{ feedback.name }}</h4>
+                            <small>For: Dr. {{ feedback.doctor.name }}</small>
+                            {% if feedback.treatment_received %}
+                            <small class="treatment">Treatment: {{ feedback.treatment_received }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if feedback.admin_response %}
+                    <div class="admin-response">
+                        <i class="fas fa-reply"></i>
+                        <p><strong>Clinic Response:</strong> {{ feedback.admin_response|truncatechars:100 }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="no-feedback">
+                    <p>No doctor feedback yet. Be the first to share your experience!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="feedback-cta">
+            <p>Share your experience with us!</p>
+            <a href="{% url 'feedback:feedback_page' %}" class="btn-primary">Give Feedback</a>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Feedback Section Styles */
+.feedback-section {
+    padding: 60px 0;
+    background: var(--gray-light);
+}
+
+.feedback-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.tab-btn {
+    padding: 12px 30px;
+    background: var(--white);
+    border: 2px solid var(--teal);
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--teal);
+}
+
+.tab-btn.active {
+    background: var(--teal);
+    color: var(--white);
+}
+
+.tab-btn:hover {
+    background: var(--teal);
+    color: var(--white);
+}
+
+.feedback-tab {
+    display: none;
+}
+
+.feedback-tab.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.feedback-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.feedback-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.feedback-rating {
+    color: #ffc107;
+    margin-bottom: 15px;
+}
+
+.feedback-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--gray-dark);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.feedback-author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.author-initial {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #26a69a, #1e847a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.author-details h4 {
+    font-size: 1rem;
+    margin-bottom: 3px;
+}
+
+.author-details small {
+    font-size: 0.7rem;
+    color: var(--gray);
+    display: block;
+}
+
+.author-details .treatment {
+    color: var(--teal);
+    margin-top: 3px;
+}
+
+.admin-response {
+    background: var(--teal-bg);
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.admin-response i {
+    color: var(--teal);
+    margin-top: 2px;
+}
+
+.admin-response p {
+    margin: 0;
+    color: var(--gray-dark);
+}
+
+.no-feedback {
+    text-align: center;
+    padding: 40px;
+    background: var(--white);
+    border-radius: 20px;
+    color: var(--gray);
+}
+
+.feedback-cta {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--gray-medium);
+}
+
+.feedback-cta p {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .feedback-tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tab-btn {
+        width: 200px;
+    }
+    
+    .feedback-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+    function showTab(tabName) {
+        // Hide all tabs
+        document.getElementById('clinic-feedback').classList.remove('active');
+        document.getElementById('doctor-feedback').classList.remove('active');
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        if (tabName === 'clinic') {
+            document.getElementById('clinic-feedback').classList.add('active');
+            document.querySelector('.tab-btn:first-child').classList.add('active');
+        } else {
+            document.getElementById('doctor-feedback').classList.add('active');
+            document.querySelector('.tab-btn:last-child').classList.add('active');
+        }
+    }
+    
+    // Feedback modal - you can implement this later
+    document.getElementById('giveFeedbackBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Feedback form will be added soon. For now, please contact clinic directly.');
+    });
+</script>
+
+<!-- Appointment CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready for a Healthy Smile & Clear Vision?</h2>
+        <p>Book your appointment today and get personalized care from our expert doctors</p>
+        {% if user.is_authenticated %}
+        <a href="/appointments/book/" class="btn-primary">Book Your Appointment Now</a>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn-primary">Book Your Appointment Now</a>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- Contact Info Bar -->
+{% if contact_settings and contact_settings.show_contact_bar %}
+<section class="contact-info-bar">
+    <div class="container">
+        <div class="info-bar-grid">
+            {% if contact_settings.bar_address %}
+            <div class="info-item">
+                <i class="{{ contact_settings.bar_address_icon }}"></i>
+                <div>
+                    <h4>Visit Us</h4>
+                    <p>{{ contact_settings.bar_address }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if contact_settings.bar_phone %}
+            <div class="info-item">
+                <i class="{{ contact_settings.bar_phone_icon }}"></i>
+                <div>
+                    <h4>Call Us</h4>
+                    <p>{{ contact_settings.bar_phone }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if contact_settings.bar_email %}
+            <div class="info-item">
+                <i class="{{ contact_settings.bar_email_icon }}"></i>
+                <div>
+                    <h4>Email Us</h4>
+                    <p>{{ contact_settings.bar_email }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if contact_settings.bar_hours %}
+            <div class="info-item">
+                <i class="{{ contact_settings.bar_hours_icon }}"></i>
+                <div>
+                    <h4>Working Hours</h4>
+                    <p>{{ contact_settings.bar_hours }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+    /* Hero Section Additional Styles */
+    .hero-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: center;
+    }
+
+    .hero-image-placeholder {
+        position: relative;
+        border-radius: 30px;
+        overflow: hidden;
+        height: 450px;
+    }
+
+    .hero-image-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(38, 166, 154, 0.2) 0%, rgba(30, 132, 122, 0.1) 100%);
+    }
+
+    .floating-card-3 {
+        bottom: 40px;
+        right: 20px;
+        left: auto;
+    }
+
+    /* About Section Additional */
+    .about-image-placeholder {
+        border-radius: 30px;
+        overflow: hidden;
+        height: 450px;
+    }
+
+    .about-image-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Doctor Image Placeholder */
+    .doctor-image-placeholder {
+        height: 280px;
+        overflow: hidden;
+    }
+
+    .doctor-image-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Contact Info Bar */
+    .contact-info-bar {
+        background: var(--teal);
+        padding: 40px 0;
+        color: var(--white);
+    }
+
+    .info-bar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        text-align: center;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .info-item i {
+        font-size: 2rem;
+    }
+
+    .info-item h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .info-item p {
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-wrapper {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .hero-content p {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+        .hero-stats {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-image-placeholder {
+            height: 300px;
+        }
+
+        .about-image-placeholder {
+            height: 300px;
+        }
+
+        .info-item {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .floating-card {
+            display: none;
+        }
+    }
+</style>
+
+<!-- Floating Chatbot Button -->
+<div class="chatbot-float" onclick="window.location.href='/chatbot/'">
+    <div class="chatbot-icon">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="chatbot-text">
+        <span>Need Help?</span>
+        <small>Chat with us</small>
+    </div>
+    <div class="chatbot-pulse"></div>
+</div>
+
+<style>
+    /* Floating Chatbot Button */
+    .chatbot-float {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(135deg, #26a69a, #1e847a);
+        padding: 12px 20px;
+        border-radius: 50px;
+        box-shadow: 0 5px 20px rgba(38, 166, 154, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .chatbot-float:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(38, 166, 154, 0.5);
+    }
+
+    .chatbot-icon {
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chatbot-icon i {
+        font-size: 1.5rem;
+        color: #26a69a;
+    }
+
+    .chatbot-text {
+        display: flex;
+        flex-direction: column;
+        color: white;
+    }
+
+    .chatbot-text span {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .chatbot-text small {
+        font-size: 0.7rem;
+        opacity: 0.9;
+    }
+
+    .chatbot-pulse {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        background: #ff6b6b;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+
+        100% {
+            transform: scale(0.8);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .chatbot-float {
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+        }
+
+        .chatbot-icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        .chatbot-icon i {
+            font-size: 1.2rem;
+        }
+
+        .chatbot-text span {
+            font-size: 0.8rem;
+        }
+
+        .chatbot-text small {
+            font-size: 0.6rem;
+        }
+    }
+
+    
+</style>
+
+{% endblock %}

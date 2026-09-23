@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}{% if seo_settings.site_name %}{{ seo_settings.site_name }}{% else %}Bishanil Dental &
+        Eye Care{% endif %}{% endblock %}</title>
+    <meta name="description"
+        content="{% block description %}{% if seo_settings.site_description %}{{ seo_settings.site_description }}{% else %}Best dental and eye care services in Kathmandu, Nepal. Expert doctors, advanced technology, affordable prices.{% endif %}{% endblock %}">
+    <meta name="keywords"
+        content="{% block keywords %}{% if seo_settings.site_keywords %}{{ seo_settings.site_keywords }}{% else %}dental clinic, eye care, dentist, ophthalmologist, tooth implant, cataract surgery, LASIK, root canal, teeth whitening{% endif %}{% endblock %}">
+    <meta name="author" content="Bishanil Dental & Eye Care">
+
+    <!-- Verification Codes -->
+    {% if seo_settings.google_verification %}
+    <meta name="google-site-verification" content="{{ seo_settings.google_verification }}">
+    {% endif %}
+    {% if seo_settings.bing_verification %}
+    <meta name="msvalidate.01" content="{{ seo_settings.bing_verification }}">
+    {% endif %}
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title"
+        content="{% block og_title %}{% if seo_settings.og_title %}{{ seo_settings.og_title }}{% else %}{{ seo_settings.site_name }}{% endif %}{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}{% if seo_settings.og_description %}{{ seo_settings.og_description }}{% else %}{{ seo_settings.site_description }}{% endif %}{% endblock %}">
+    <meta property="og:image"
+        content="{% if seo_settings.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ seo_settings.og_image.url }}{% else %}{% static 'images/og-image.jpg' %}{% endif %}">
+    <meta property="og:site_name" content="{{ seo_settings.site_name }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="{{ seo_settings.twitter_card_type }}">
+    <meta name="twitter:site" content="{{ seo_settings.twitter_site }}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ seo_settings.site_name }}{% endblock %}">
+    <meta name="twitter:description"
+        content="{% block twitter_description %}{{ seo_settings.site_description }}{% endblock %}">
+    <meta name="twitter:image"
+        content="{% if seo_settings.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ seo_settings.og_image.url }}{% else %}{% static 'images/og-image.jpg' %}{% endif %}">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+
+    <!-- Robots -->
+    {% if no_index or no_follow %}
+    <meta name="robots"
+        content="{% if no_index %}noindex{% else %}index{% endif %}, {% if no_follow %}nofollow{% else %}follow{% endif %}">
+    {% else %}
+    <meta name="robots" content="index, follow">
+    {% endif %}
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Google Analytics -->
+    {% if seo_settings.google_analytics_id %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_settings.google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{ seo_settings.google_analytics_id }}');
+    </script>
+    {% endif %}
+
+    <!-- Google Tag Manager -->
+    {% if seo_settings.google_tag_manager_id %}
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', '{{ seo_settings.google_tag_manager_id }}');</script>
+    {% endif %}
+
+    <!-- Custom Header Code -->
+    {% if seo_settings.custom_header_code %}
+    {{ seo_settings.custom_header_code|safe }}
+    {% endif %}
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<!-- Floating Chatbot Button -->
+<div class="chatbot-float" onclick="window.location.href='/chatbot/'">
+    <div class="chatbot-icon">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="chatbot-text">
+        <span>Need Help?</span>
+        <small>Chat with us</small>
+    </div>
+    <div class="chatbot-pulse"></div>
+</div>
+
+<style>
+/* Floating Chatbot Button */
+.chatbot-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #26a69a, #1e847a);
+    padding: 12px 20px;
+    border-radius: 50px;
+    box-shadow: 0 5px 20px rgba(38, 166, 154, 0.4);
+    transition: all 0.3s ease;
+}
+
+.chatbot-float:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(38, 166, 154, 0.5);
+}
+
+.chatbot-icon {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-icon i {
+    font-size: 1.5rem;
+    color: #26a69a;
+}
+
+.chatbot-text {
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.chatbot-text span {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.chatbot-text small {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.chatbot-pulse {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .chatbot-float {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 15px;
+    }
+    
+    .chatbot-icon {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .chatbot-icon i {
+        font-size: 1.2rem;
+    }
+    
+    .chatbot-text span {
+        font-size: 0.8rem;
+    }
+    
+    .chatbot-text small {
+        font-size: 0.6rem;
+    }
+}
+</style>
+
+<body>
+   
+   
+     <!-- Google Tag Manager (noscript) -->
+    {% if seo_settings.google_tag_manager_id %}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ seo_settings.google_tag_manager_id }}"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {% endif %}
+
+    {% include 'includes/navbar.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "{{ seo_settings.business_type|default:'MedicalClinic' }}",
+        "name": "{{ seo_settings.site_name }}",
+        "description": "{{ seo_settings.site_description|escapejs }}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}",
+        "telephone": "+9779800000000",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Kathmandu",
+            "addressCountry": "NP"
+        },
+        "openingHours": "Mo-Fr 09:00-20:00, Sa-Su 10:00-17:00"
+    }
+    </script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Custom Footer Code -->
+    {% if seo_settings.custom_footer_code %}
+    {{ seo_settings.custom_footer_code|safe }}
+    {% endif %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

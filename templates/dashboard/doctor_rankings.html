@@ -1,0 +1,122 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Doctor Rankings{% endblock %}
+{% block page_title %}AI Doctor Rankings{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div style="background: linear-gradient(135deg, #26a69a, #1e847a); padding: 30px; border-radius: 20px; margin-bottom: 30px; color: white; box-shadow: 0 10px 30px rgba(38, 166, 154, 0.25);">
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div style="flex: 1;">
+            <h2 style="margin: 0 0 5px 0; font-size: 1.6rem;">AI-Powered Doctor Rankings</h2>
+            <p style="margin: 0; opacity: 0.9; font-size: 0.95rem;">
+                Ranking formula: <strong>(Rating × 50%) + (Experience × 30%) + (Appointments × 20%)</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Rankings Grid -->
+{% if rankings %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px;">
+
+    {% for item in rankings %}
+    <div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); position: relative; border: 2px solid {% if item.rank == 1 %}#ffd700{% elif item.rank == 2 %}#c0c0c0{% elif item.rank == 3 %}#cd7f32{% else %}#eef2f5{% endif %};">
+
+        <!-- Rank Badge -->
+        <div style="position: absolute; top: -15px; left: 20px; padding: 8px 20px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; color: white;
+            {% if item.rank == 1 %}background: linear-gradient(135deg, #ffd700, #ff8c00);
+            {% elif item.rank == 2 %}background: linear-gradient(135deg, #c0c0c0, #808080);
+            {% elif item.rank == 3 %}background: linear-gradient(135deg, #cd7f32, #8b4513);
+            {% else %}background: linear-gradient(135deg, #6c757d, #495057);{% endif %}
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            {% if item.rank == 1 %}🏆 Rank #1{% elif item.rank == 2 %}🥈 Rank #2{% elif item.rank == 3 %}🥉 Rank #3{% else %}Rank #{{ item.rank }}{% endif %}
+        </div>
+
+        <!-- Doctor Info -->
+        <div style="display: flex; align-items: center; gap: 15px; margin-top: 15px; margin-bottom: 20px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #26a69a, #1e847a); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid white; box-shadow: 0 5px 15px rgba(38, 166, 154, 0.25);">
+                {% if item.doctor.profile_image %}
+                <img src="{{ item.doctor.profile_image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <i class="fas fa-user-md" style="color: white; font-size: 2rem;"></i>
+                {% endif %}
+            </div>
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 3px 0; font-size: 1.1rem; color: #1a1a2e;">Dr. {{ item.doctor.name }}</h3>
+                <p style="margin: 0; color: #26a69a; font-size: 0.8rem; font-weight: 500;">{{ item.doctor.specialization }}</p>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+            <div style="background: #fff8e1; padding: 12px 8px; border-radius: 12px; text-align: center;">
+                <i class="fas fa-star" style="color: #ffc107; font-size: 1rem;"></i>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 700; color: #212529;">{{ item.avg_rating }}</p>
+                <p style="margin: 0; font-size: 0.65rem; color: #6c757d; text-transform: uppercase;">Rating</p>
+            </div>
+            <div style="background: #e0f7fa; padding: 12px 8px; border-radius: 12px; text-align: center;">
+                <i class="fas fa-briefcase" style="color: #26a69a; font-size: 1rem;"></i>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 700; color: #212529;">{{ item.doctor.experience_years }}</p>
+                <p style="margin: 0; font-size: 0.65rem; color: #6c757d; text-transform: uppercase;">Years</p>
+            </div>
+            <div style="background: #e3f2fd; padding: 12px 8px; border-radius: 12px; text-align: center;">
+                <i class="fas fa-calendar-check" style="color: #2196f3; font-size: 1rem;"></i>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 700; color: #212529;">{{ item.total_appointments }}</p>
+                <p style="margin: 0; font-size: 0.65rem; color: #6c757d; text-transform: uppercase;">Visits</p>
+            </div>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
+                    <i class="fas fa-brain" style="color: #26a69a;"></i> AI Score
+                </span>
+                <span style="font-size: 1.3rem; font-weight: 800; color: #26a69a;">{{ item.score }}</span>
+            </div>
+            <div style="font-size: 0.7rem; color: #6c757d; line-height: 1.8;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Rating contribution (50%)</span>
+                    <span>{{ item.rating_component }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Experience contribution (30%)</span>
+                    <span>{{ item.experience_component }}</span>
+                </div>
+                <div style="display: flex; justify-content: justify; justify-content: space-between;">
+                    <span>Demand contribution (20%)</span>
+                    <span>{{ item.appointment_component }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action -->
+        <div style="display: flex; gap: 8px;">
+            <a href="/doctors/{{ item.doctor.slug }}/" target="_blank" style="flex: 1; background: #26a69a; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: 600; text-align: center;">
+                <i class="fas fa-eye"></i> View
+            </a>
+            <a href="/admin-panel/doctors/{{ item.doctor.id }}/edit/" style="flex: 1; background: #2196f3; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: 600; text-align: center;">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+{% else %}
+<div style="background: white; padding: 60px; border-radius: 20px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <i class="fas fa-trophy" style="font-size: 4rem; color: #dee2e6; display: block; margin-bottom: 20px;"></i>
+    <h3 style="color: #6c757d;">No approved doctors yet</h3>
+    <p style="color: #6c757d;">Add some doctors to see AI rankings.</p>
+</div>
+{% endif %}
+
+{% endblock %}

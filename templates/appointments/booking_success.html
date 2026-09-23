@@ -1,0 +1,226 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Booking Successful - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="success-section">
+    <div class="container">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Booking Successful!</h1>
+            <p>Your appointment has been booked successfully.</p>
+            <div class="success-message">
+                <i class="fas fa-envelope"></i>
+                <p>A confirmation email has been sent to your registered email address.</p>
+            </div>
+            
+            <!-- Payment Options -->
+           <div class="payment-options">
+    <h3>Complete Payment to Confirm Appointment</h3>
+    <p>Amount to Pay: <strong>Rs. 500</strong></p>
+    <div class="payment-buttons">
+        <button class="payment-btn khalti-btn" id="khaltiPayBtn">
+            <img src="https://khalti.com/static/images/logo.png" alt="Khalti" style="height: 30px;">
+            Pay with Khalti
+        </button>
+        <button class="payment-btn esewa-btn" id="esewaPayBtn">
+            <img src="https://esewa.com.np/common/images/esewa.png" alt="eSewa" style="height: 25px;">
+            Pay with eSewa
+        </button>
+        <button class="payment-btn cash-btn" id="cashPayBtn">
+            <i class="fas fa-money-bill-wave"></i> Pay at Clinic
+        </button>
+    </div>
+    <p class="payment-note">* Your appointment will be confirmed after payment</p>
+</div>
+            
+            <div class="success-actions">
+                <a href="{% url 'accounts:my_appointments' %}" class="btn-primary">View My Appointments</a>
+                <a href="/" class="btn-secondary">Go to Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .success-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .success-card {
+        max-width: 550px;
+        margin: 0 auto;
+        background: var(--white);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .success-icon i {
+        font-size: 5rem;
+        color: #4caf50;
+        margin-bottom: 20px;
+    }
+    
+    .success-card h1 {
+        margin-bottom: 15px;
+        color: var(--teal);
+    }
+    
+    .success-message {
+        background: var(--teal-bg);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+    }
+    
+    .success-message i {
+        font-size: 1.5rem;
+        color: var(--teal);
+    }
+    
+    .payment-options {
+        background: var(--gray-light);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+    }
+    
+    .payment-options h3 {
+        margin-bottom: 10px;
+        color: var(--dark);
+    }
+    
+    .payment-options p {
+        margin-bottom: 15px;
+    }
+    
+    .payment-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+    
+    .payment-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    .khalti-btn {
+        background: #5C2D91;
+        color: white;
+    }
+    
+    .khalti-btn:hover {
+        background: #4a1e7a;
+        transform: translateY(-2px);
+    }
+    
+    .esewa-btn {
+        background: #1a1a2e;
+        color: white;
+    }
+    
+    .esewa-btn:hover {
+        background: #0d0d1a;
+        transform: translateY(-2px);
+    }
+    
+    .cash-btn {
+        background: var(--teal);
+        color: white;
+    }
+    
+    .cash-btn:hover {
+        background: var(--teal-dark);
+        transform: translateY(-2px);
+    }
+    
+    .payment-note {
+        font-size: 0.8rem;
+        color: var(--gray);
+        margin-top: 10px;
+    }
+    
+    .success-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .success-card {
+            padding: 25px;
+            margin: 0 20px;
+        }
+        
+        .payment-buttons {
+            flex-direction: column;
+        }
+        
+        .payment-btn {
+            justify-content: center;
+        }
+    }
+</style>
+<script>
+    // Get transaction ID from the session
+    let transactionId = '';
+    
+    // Fetch transaction ID from server
+    fetch('/payments/latest-transaction/')
+        .then(response => response.json())
+        .then(data => {
+            transactionId = data.transaction_id;
+            console.log('Transaction ID:', transactionId);
+        })
+        .catch(error => console.error('Error:', error));
+    
+    // Khalti payment - Working redirect
+    document.getElementById('khaltiPayBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (transactionId) {
+            window.location.href = `/payments/khalti/verify/${transactionId}/`;
+        } else {
+            // Fallback - create a test transaction
+            window.location.href = `/payments/khalti/verify/test123/`;
+        }
+    });
+    
+    // eSewa payment
+    document.getElementById('esewaPayBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('eSewa payment is being set up. For now, please use Khalti or pay at clinic.');
+    });
+    
+    // Cash payment
+    document.getElementById('cashPayBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('You have selected "Pay at Clinic". Your appointment will be confirmed when you pay at our clinic. Continue?')) {
+            window.location.href = "{% url 'accounts:my_appointments' %}";
+        }
+    });
+</script>
+{% endblock %}

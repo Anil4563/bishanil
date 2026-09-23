@@ -1,0 +1,350 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} - Bishanil Eye Care{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>{{ service.name }}</h1>
+        <p>{{ service.short_description }}</p>
+    </div>
+</section>
+
+<!-- Service Details -->
+<section class="service-detail">
+    <div class="container">
+        <div class="service-grid">
+            <div class="service-content">
+                <h2>About {{ service.name }}</h2>
+                <p>{{ service.full_description|linebreaks }}</p>
+
+                {% if service.benefits %}
+                <div class="benefits">
+                    <h3>Key Benefits</h3>
+                    <ul>
+                        {% for benefit in service.benefits %}
+                        <li><i class="fas fa-check-circle"></i> {{ benefit }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if service.procedure_duration or service.recovery_time %}
+                <div class="info-box">
+                    <h3>Procedure Information</h3>
+                    {% if service.procedure_duration %}
+                    <p><strong>Duration:</strong> {{ service.procedure_duration }}</p>
+                    {% endif %}
+                    {% if service.recovery_time %}
+                    <p><strong>Recovery Time:</strong> {{ service.recovery_time }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if service.starting_price %}
+                <div class="pricing">
+                    <h3>Pricing</h3>
+                    <p>Starting from <strong>₹{{ service.starting_price }}</strong> {{ service.price_note }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="service-sidebar">
+                <div class="booking-card">
+                    <h3>Book Appointment</h3>
+                    <p>Get expert consultation for {{ service.name }}</p>
+                    {% if user.is_authenticated %}
+                    <a href="/appointments/book/" class="btn-primary">Book Now</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn-primary">Book Now</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Procedures -->
+        {% if procedures %}
+        <div class="procedures">
+            <h2>Treatments & Procedures</h2>
+            <div class="procedures-grid">
+                {% for procedure in procedures %}
+                <div class="procedure-card">
+                    <h3>{{ procedure.name }}</h3>
+                    <p>{{ procedure.description }}</p>
+                    {% if procedure.duration %}
+                    <span class="duration"><i class="fas fa-clock"></i> {{ procedure.duration }}</span>
+                    {% endif %}
+                    {% if procedure.recovery_time %}
+                    <span class="recovery"><i class="fas fa-heartbeat"></i> {{ procedure.recovery_time }}</span>
+                    {% endif %}
+                    {% if procedure.price %}
+                    <span class="price">₹{{ procedure.price }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- FAQs -->
+        {% if faqs %}
+        <div class="faqs">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-list">
+                {% for faq in faqs %}
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        <span>{{ faq.question }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>{{ faq.answer }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Related Services -->
+        {% if related_services %}
+        <div class="related-services">
+            <h2>Related Services</h2>
+            <div class="related-grid">
+                {% for related in related_services %}
+                <div class="related-card">
+                    <i class="{{ related.icon_class }}"></i>
+                    <h4>{{ related.name }}</h4>
+                    <a href="{% url 'eyecare:service_detail' related.slug %}">Learn More →</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: var(--teal);
+        margin-bottom: 15px;
+    }
+
+    .service-detail {
+        padding: 60px 0;
+    }
+
+    .service-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 40px;
+        margin-bottom: 60px;
+    }
+
+    .service-content h2 {
+        margin-bottom: 20px;
+    }
+
+    .benefits,
+    .info-box {
+        background: var(--teal-bg);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 30px 0;
+    }
+
+    .benefits ul {
+        list-style: none;
+        margin-top: 15px;
+    }
+
+    .benefits ul li {
+        margin-bottom: 10px;
+    }
+
+    .benefits ul li i {
+        color: var(--teal);
+        margin-right: 10px;
+    }
+
+    .info-box p {
+        margin: 10px 0;
+    }
+
+    .booking-card {
+        background: var(--gray-light);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        position: sticky;
+        top: 100px;
+    }
+
+    .booking-card h3 {
+        margin-bottom: 15px;
+    }
+
+    .procedures {
+        margin-bottom: 60px;
+    }
+
+    .procedures h2 {
+        margin-bottom: 30px;
+    }
+
+    .procedures-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .procedure-card {
+        background: var(--white);
+        border: 1px solid var(--gray-medium);
+        padding: 20px;
+        border-radius: 15px;
+        transition: var(--transition);
+    }
+
+    .procedure-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+    }
+
+    .procedure-card h3 {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .duration,
+    .recovery,
+    .price {
+        display: inline-block;
+        margin-top: 15px;
+        font-size: 0.85rem;
+        margin-right: 15px;
+    }
+
+    .duration,
+    .recovery {
+        color: var(--gray);
+    }
+
+    .price {
+        color: var(--teal);
+        font-weight: 600;
+    }
+
+    .faqs {
+        margin-bottom: 60px;
+    }
+
+    .faqs h2 {
+        margin-bottom: 30px;
+    }
+
+    .faq-item {
+        border: 1px solid var(--gray-medium);
+        border-radius: 10px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+
+    .faq-question {
+        padding: 15px 20px;
+        background: var(--white);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .faq-question i:first-child {
+        color: var(--teal);
+    }
+
+    .faq-question span {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .faq-answer {
+        padding: 0 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: var(--gray-light);
+    }
+
+    .faq-item.active .faq-answer {
+        padding: 15px 20px;
+        max-height: 300px;
+    }
+
+    .faq-item.active .faq-question i:last-child {
+        transform: rotate(180deg);
+    }
+
+    .related-services {
+        margin-top: 40px;
+    }
+
+    .related-services h2 {
+        margin-bottom: 30px;
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .related-card {
+        background: var(--gray-light);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        background: var(--teal-bg);
+    }
+
+    .related-card i {
+        font-size: 2rem;
+        color: var(--teal);
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .service-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const faqItem = question.parentElement;
+            faqItem.classList.toggle('active');
+        });
+    });
+</script>
+{% endblock %}

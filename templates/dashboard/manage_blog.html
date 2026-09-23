@@ -1,0 +1,163 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Manage Blog{% endblock %}
+{% block page_title %}Blog Posts{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 style="color: #212529; margin: 0;"><i class="fas fa-blog" style="color: #26a69a;"></i> Blog Posts</h2>
+    <button onclick="openAddModal()" style="background: linear-gradient(135deg, #26a69a, #1e847a); color: white; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 0.9rem;">
+        <i class="fas fa-plus"></i> Add Blog Post
+    </button>
+</div>
+
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        All Posts ({{ posts.count }})
+    </h3>
+
+    {% if posts %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Image</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Title</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Author</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Views</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if post.featured_image %}
+                    <img src="{{ post.featured_image.url }}" style="width: 60px; height: 40px; border-radius: 8px; object-fit: cover;">
+                    {% else %}
+                    <div style="width: 60px; height: 40px; border-radius: 8px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #adb5bd;"><i class="fas fa-image"></i></div>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><strong>{{ post.title|truncatechars:50 }}</strong></td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ post.author_name }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if post.status == 'published' %}
+                    <span style="background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Published</span>
+                    {% else %}
+                    <span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Draft</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><i class="fas fa-eye" style="color: #6c757d; margin-right: 5px;"></i>{{ post.views }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <button onclick="openEditModal({{ post.id }}, '{{ post.title|escapejs }}', '{{ post.post_type }}', '{{ post.excerpt|escapejs }}', '{{ post.content|escapejs }}', '{{ post.status }}', {{ post.is_featured|yesno:"true,false" }})" style="background: #2196f3; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; margin-right: 3px;"><i class="fas fa-edit"></i></button>
+                    <a href="{% url 'dashboard:delete_blog' post.id %}" onclick="return confirm('Delete this post?');" style="background: #f44336; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem;"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No blog posts yet.</p>
+    {% endif %}
+</div>
+
+<!-- ADD BLOG MODAL -->
+<div id="addModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 750px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeAddModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #26a69a; margin-bottom: 25px;"><i class="fas fa-plus-circle"></i> New Blog Post</h2>
+        <form method="POST" action="{% url 'dashboard:add_blog' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Title *</label><input type="text" name="title" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Post Type *</label>
+                    <select name="post_type" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="dental">Dental Care</option>
+                        <option value="eye">Eye Care</option>
+                        <option value="general">General Health</option>
+                        <option value="tips">Health Tips</option>
+                        <option value="news">Clinic News</option>
+                    </select>
+                </div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Author</label><input type="text" name="author_name" value="Admin" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Excerpt (Short Summary) *</label><textarea name="excerpt" rows="2" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea></div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Content * (HTML allowed)</label><textarea name="content" rows="8" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:monospace;font-size:0.85rem;"></textarea></div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Featured Image</label><input type="file" name="featured_image" accept="image/*" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Status</label>
+                    <select name="status" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding-top:25px;">
+                    <input type="checkbox" name="is_featured" id="add_featured" style="width:18px;height:18px;">
+                    <label for="add_featured" style="font-weight:500;font-size:0.9rem;cursor:pointer;">Mark as Featured</label>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeAddModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#26a69a,#1e847a);color:white;cursor:pointer;font-family:inherit;font-weight:600;">Publish Post</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT BLOG MODAL -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto;">
+    <div style="max-width: 750px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+        <span onclick="closeEditModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2 style="color: #2196f3; margin-bottom: 25px;"><i class="fas fa-edit"></i> Edit Blog Post</h2>
+        <form method="POST" id="editForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Title</label><input type="text" name="title" id="edit_title" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Post Type</label>
+                    <select name="post_type" id="edit_type" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="dental">Dental Care</option>
+                        <option value="eye">Eye Care</option>
+                        <option value="general">General Health</option>
+                        <option value="tips">Health Tips</option>
+                        <option value="news">Clinic News</option>
+                    </select>
+                </div>
+                <div><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Status</label>
+                    <select name="status" id="edit_status" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Excerpt</label><textarea name="excerpt" id="edit_excerpt" rows="2" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></textarea></div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Content</label><textarea name="content" id="edit_content" rows="8" required style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:monospace;font-size:0.85rem;"></textarea></div>
+                <div style="grid-column: span 2;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:6px;">Featured Image (leave blank to keep)</label><input type="file" name="featured_image" accept="image/*" style="width:100%;padding:11px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;"></div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <input type="checkbox" name="is_featured" id="edit_featured" style="width:18px;height:18px;">
+                    <label for="edit_featured" style="font-weight:500;font-size:0.9rem;cursor:pointer;">Featured</label>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                <button type="button" onclick="closeEditModal()" style="padding:12px 24px;border-radius:10px;border:none;background:#e9ecef;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button type="submit" style="padding:12px 24px;border-radius:10px;border:none;background:#2196f3;color:white;cursor:pointer;font-family:inherit;font-weight:600;">Update Post</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddModal() { document.getElementById('addModal').style.display = 'block'; }
+function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+function openEditModal(id, title, type, excerpt, content, status, isFeatured) {
+    document.getElementById('edit_title').value = title;
+    document.getElementById('edit_type').value = type;
+    document.getElementById('edit_excerpt').value = excerpt;
+    document.getElementById('edit_content').value = content;
+    document.getElementById('edit_status').value = status;
+    document.getElementById('edit_featured').checked = isFeatured;
+    document.getElementById('editForm').action = '/admin-panel/blog/' + id + '/edit/';
+    document.getElementById('editModal').style.display = 'block';
+}
+function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+</script>
+
+{% endblock %}

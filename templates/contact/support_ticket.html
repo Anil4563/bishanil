@@ -1,0 +1,195 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Support Ticket - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Support <span>Ticket</span></h1>
+        <p>Submit a support ticket for any issues or queries</p>
+    </div>
+</section>
+
+<section class="support-section">
+    <div class="container">
+        <div class="support-grid">
+            <div class="support-form">
+                <h2>Create Support Ticket</h2>
+                <form method="POST" action="{% url 'contact:submit_support' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Your Name *</label>
+                            <input type="text" name="patient_name" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Email Address *</label>
+                            <input type="email" name="patient_email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Phone Number *</label>
+                            <input type="tel" name="patient_phone" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Priority *</label>
+                            <select name="priority" required>
+                                <option value="low">Low - General query</option>
+                                <option value="medium">Medium - Need assistance</option>
+                                <option value="high">High - Urgent issue</option>
+                                <option value="urgent">Urgent - Critical problem</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Subject *</label>
+                        <input type="text" name="subject" required placeholder="Brief description of your issue">
+                    </div>
+                    <div class="form-field">
+                        <label>Message *</label>
+                        <textarea name="message" rows="5" required placeholder="Please describe your issue in detail..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Submit Ticket</button>
+                </form>
+            </div>
+            
+            <div class="support-info">
+                <div class="info-box">
+                    <i class="fas fa-ticket-alt"></i>
+                    <h3>What happens after submitting?</h3>
+                    <ul>
+                        <li>✓ You'll receive a unique Ticket ID</li>
+                        <li>✓ Our support team will review your issue</li>
+                        <li>✓ Response within 24 hours</li>
+                        <li>✓ Track your ticket status</li>
+                    </ul>
+                </div>
+                
+                <div class="info-box">
+                    <i class="fas fa-clock"></i>
+                    <h3>Support Hours</h3>
+                    <p>Monday - Friday: 9:00 AM - 8:00 PM<br>
+                    Saturday - Sunday: 10:00 AM - 5:00 PM</p>
+                </div>
+                
+                <div class="info-box">
+                    <i class="fas fa-phone-alt"></i>
+                    <h3>Need Immediate Help?</h3>
+                    <p>Call us directly at:</p>
+                    <h4>{{ clinic_info.phone_primary }}</h4>
+                    <p>For emergencies: <strong>{{ clinic_info.emergency_phone }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .support-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
+    
+    .support-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+    
+    .support-form {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .support-form h2 {
+        margin-bottom: 25px;
+        color: var(--teal);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+    
+    .form-field label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 12px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 10px;
+        font-family: inherit;
+    }
+    
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: var(--teal);
+    }
+    
+    .support-info .info-box {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .info-box i {
+        font-size: 2.5rem;
+        color: var(--teal);
+        margin-bottom: 15px;
+    }
+    
+    .info-box h3 {
+        margin-bottom: 15px;
+    }
+    
+    .info-box ul {
+        list-style: none;
+        text-align: left;
+    }
+    
+    .info-box li {
+        margin-bottom: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        .support-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

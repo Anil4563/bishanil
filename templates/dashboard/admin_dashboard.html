@@ -1,0 +1,157 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Main Stats Grid -->
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px;">
+    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #26a69a;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <p style="color: #6c757d; font-size: 0.85rem; margin-bottom: 8px;">Total Appointments</p>
+                <h3 style="font-size: 1.8rem; color: #212529;">{{ total_appointments }}</h3>
+                <small style="color: #26a69a; font-size: 0.75rem;">{{ today_appointments }} today</small>
+            </div>
+            <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #26a69a, #1e847a); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #2196f3;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <p style="color: #6c757d; font-size: 0.85rem; margin-bottom: 8px;">Total Doctors</p>
+                <h3 style="font-size: 1.8rem; color: #212529;">{{ total_doctors }}</h3>
+                <small style="color: #ff9800; font-size: 0.75rem;">{{ pending_doctors }} pending</small>
+            </div>
+            <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #2196f3, #1565c0); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-user-md"></i>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #9c27b0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <p style="color: #6c757d; font-size: 0.85rem; margin-bottom: 8px;">Total Patients</p>
+                <h3 style="font-size: 1.8rem; color: #212529;">{{ total_patients }}</h3>
+                <small style="color: #6c757d; font-size: 0.75rem;">Registered users</small>
+            </div>
+            <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #9c27b0, #6a1b9a); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #4caf50;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <p style="color: #6c757d; font-size: 0.85rem; margin-bottom: 8px;">Total Revenue</p>
+                <h3 style="font-size: 1.8rem; color: #212529;">Rs. {{ total_revenue|floatformat:0 }}</h3>
+                <small style="color: #4caf50; font-size: 0.75rem;">Rs. {{ monthly_revenue|floatformat:0 }} this month</small>
+            </div>
+            <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #4caf50, #2e7d32); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mini Stats Row -->
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+    <div style="background: white; padding: 18px 22px; border-radius: 15px; box-shadow: 0 3px 12px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-clock" style="font-size: 1.8rem; color: #ff9800;"></i>
+        <div><h4 style="font-size: 1.4rem; color: #212529;">{{ pending_appointments }}</h4><p style="font-size: 0.75rem; color: #6c757d; margin: 0;">Pending</p></div>
+    </div>
+    <div style="background: white; padding: 18px 22px; border-radius: 15px; box-shadow: 0 3px 12px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-check-circle" style="font-size: 1.8rem; color: #4caf50;"></i>
+        <div><h4 style="font-size: 1.4rem; color: #212529;">{{ completed_appointments }}</h4><p style="font-size: 0.75rem; color: #6c757d; margin: 0;">Completed</p></div>
+    </div>
+    <div style="background: white; padding: 18px 22px; border-radius: 15px; box-shadow: 0 3px 12px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-comments" style="font-size: 1.8rem; color: #26a69a;"></i>
+        <div><h4 style="font-size: 1.4rem; color: #212529;">{{ pending_feedbacks }}</h4><p style="font-size: 0.75rem; color: #6c757d; margin: 0;">Reviews</p></div>
+    </div>
+    <div style="background: white; padding: 18px 22px; border-radius: 15px; box-shadow: 0 3px 12px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-user-plus" style="font-size: 1.8rem; color: #2196f3;"></i>
+        <div><h4 style="font-size: 1.4rem; color: #212529;">{{ recent_patients.count }}</h4><p style="font-size: 0.75rem; color: #6c757d; margin: 0;">New Users</p></div>
+    </div>
+</div>
+
+<!-- Recent Appointments -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        <h3 style="font-size: 1.1rem; color: #212529; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-calendar-alt" style="color: #26a69a;"></i> Recent Appointments
+        </h3>
+        <a href="{% url 'dashboard:manage_appointments' %}" style="color: #26a69a; text-decoration: none; font-size: 0.85rem; font-weight: 600;">View All →</a>
+    </div>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Patient</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Date</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Doctor</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for apt in recent_appointments %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.patient_name }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.appointment_date }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{% if apt.doctor %}Dr. {{ apt.doctor.name }}{% else %}-{% endif %}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                        {% if apt.status == 'completed' %}background: #d4edda; color: #155724;
+                        {% elif apt.status == 'pending' %}background: #fff3cd; color: #856404;
+                        {% elif apt.status == 'cancelled' %}background: #f8d7da; color: #721c24;
+                        {% else %}background: #cce5ff; color: #004085;{% endif %}">
+                        {{ apt.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="padding: 30px; text-align: center; color: #6c757d;">No appointments yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Quick Actions -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="font-size: 1.1rem; color: #212529; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+        <i class="fas fa-bolt" style="color: #26a69a;"></i> Quick Actions
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px;">
+        <a href="{% url 'dashboard:manage_doctors' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529; transition: all 0.3s;" onmouseover="this.style.background='#26a69a'; this.style.color='white';" onmouseout="this.style.background='#f8f9fa'; this.style.color='#212529';">
+            <i class="fas fa-user-md" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Doctors</span>
+        </a>
+        <a href="{% url 'dashboard:manage_appointments' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-calendar-alt" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Appointments</span>
+        </a>
+        <a href="{% url 'dashboard:manage_patients' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-users" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Patients</span>
+        </a>
+        <a href="{% url 'dashboard:manage_feedback' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-star" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Feedback</span>
+        </a>
+        <a href="{% url 'dashboard:manage_payments' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-credit-card" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Payments</span>
+        </a>
+        <a href="{% url 'dashboard:manage_blog' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-blog" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.75rem; font-weight: 600;">Blog</span>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

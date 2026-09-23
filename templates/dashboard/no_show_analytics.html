@@ -1,0 +1,205 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}No-Show Analytics{% endblock %}
+{% block page_title %}AI No-Show Analytics{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div style="background: linear-gradient(135deg, #f44336, #c62828); padding: 30px; border-radius: 20px; margin-bottom: 30px; color: white; box-shadow: 0 10px 30px rgba(244, 67, 54, 0.25);">
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div style="flex: 1;">
+            <h2 style="margin: 0 0 5px 0; font-size: 1.6rem;">Patient No-Show Prediction</h2>
+            <p style="margin: 0; opacity: 0.9; font-size: 0.95rem;">
+                Machine Learning model (Logistic Regression) predicting appointment attendance
+            </p>
+        </div>
+        {% if model_info.success %}
+        <div style="text-align: right;">
+            <div style="font-size: 2rem; font-weight: 800;">{{ model_info.accuracy }}%</div>
+            <div style="font-size: 0.75rem; opacity: 0.9;">Model Accuracy</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+    <div style="background: white; padding: 22px; border-radius: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #4caf50;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; border-radius: 15px; background: linear-gradient(135deg, #4caf50, #2e7d32); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <p style="color: #6c757d; font-size: 0.8rem; margin: 0 0 3px 0;">Attendance Rate</p>
+                <h3 style="font-size: 1.6rem; color: #212529; margin: 0;">{{ attendance_rate }}%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 22px; border-radius: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #f44336;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; border-radius: 15px; background: linear-gradient(135deg, #f44336, #c62828); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem;">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <div>
+                <p style="color: #6c757d; font-size: 0.8rem; margin: 0 0 3px 0;">No-Show Rate</p>
+                <h3 style="font-size: 1.6rem; color: #212529; margin: 0;">{{ no_show_rate }}%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 22px; border-radius: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #2196f3;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; border-radius: 15px; background: linear-gradient(135deg, #2196f3, #1565c0); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem;">
+                <i class="fas fa-database"></i>
+            </div>
+            <div>
+                <p style="color: #6c757d; font-size: 0.8rem; margin: 0 0 3px 0;">Training Samples</p>
+                <h3 style="font-size: 1.6rem; color: #212529; margin: 0;">{{ total_historical }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 22px; border-radius: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 5px solid #ff9800;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; border-radius: 15px; background: linear-gradient(135deg, #ff9800, #e65100); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem;">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div>
+                <p style="color: #6c757d; font-size: 0.8rem; margin: 0 0 3px 0;">Upcoming</p>
+                <h3 style="font-size: 1.6rem; color: #212529; margin: 0;">{{ total_upcoming }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Distribution -->
+<div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin: 0 0 20px 0; color: #212529;">
+        <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i> Risk Distribution (Upcoming Appointments)
+    </h3>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+        <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 20px; border-radius: 15px; text-align: center;">
+            <div style="font-size: 0.8rem; color: #155724; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">🟢 Low Risk</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #155724;">{{ low_risk }}</div>
+            <div style="font-size: 0.7rem; color: #155724; opacity: 0.8;">Likely to attend</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #fff3cd, #ffe8a1); padding: 20px; border-radius: 15px; text-align: center;">
+            <div style="font-size: 0.8rem; color: #856404; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">🟠 Medium Risk</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #856404;">{{ medium_risk }}</div>
+            <div style="font-size: 0.7rem; color: #856404; opacity: 0.8;">Send a reminder</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #f8d7da, #f5c2c7); padding: 20px; border-radius: 15px; text-align: center;">
+            <div style="font-size: 0.8rem; color: #721c24; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">🔴 High Risk</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #721c24;">{{ high_risk }}</div>
+            <div style="font-size: 0.7rem; color: #721c24; opacity: 0.8;">Extra reminder needed</div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Appointments with Predictions -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin: 0 0 20px 0; color: #212529;">
+        <i class="fas fa-list" style="color: #26a69a;"></i> Upcoming Appointments & Predictions
+    </h3>
+
+    {% if upcoming_predictions %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Patient</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Date</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Doctor</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">No-Show Probability</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Risk Level</th>
+                <th style="padding: 12px; text-align: left; font-size: 0.75rem; color: #6c757d; text-transform: uppercase; border-bottom: 2px solid #f0f0f0;">Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for apt in upcoming_predictions %}
+            <tr>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;"><strong>{{ apt.patient_name }}</strong></td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ apt.appointment_date }}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{% if apt.doctor %}Dr. {{ apt.doctor.name }}{% else %}-{% endif %}</td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if apt.prediction.model_ready %}
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="flex: 1; max-width: 150px; background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; width: {{ apt.prediction.probability }}%; background: {% if apt.prediction.risk_color == 'success' %}#4caf50{% elif apt.prediction.risk_color == 'warning' %}#ff9800{% else %}#f44336{% endif %};"></div>
+                        </div>
+                        <strong style="color: {% if apt.prediction.risk_color == 'success' %}#4caf50{% elif apt.prediction.risk_color == 'warning' %}#ff9800{% else %}#f44336{% endif %};">
+                            {{ apt.prediction.probability }}%
+                        </strong>
+                    </div>
+                    {% else %}
+                    <small style="color: #6c757d;">Not available</small>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    {% if apt.prediction.model_ready %}
+                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+                        {% if apt.prediction.risk_color == 'success' %}background: #d4edda; color: #155724;
+                        {% elif apt.prediction.risk_color == 'warning' %}background: #fff3cd; color: #856404;
+                        {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                        {{ apt.prediction.risk_level }}
+                    </span>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">
+                    <small style="color: #495057;">{{ apt.prediction.message }}</small>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">
+        <i class="fas fa-calendar-check" style="font-size: 3rem; color: #dee2e6; display: block; margin-bottom: 15px;"></i>
+        No upcoming appointments to analyze
+    </p>
+    {% endif %}
+</div>
+
+<!-- Model Info Card -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-top: 30px;">
+    <h3 style="margin: 0 0 20px 0; color: #212529;">
+        <i class="fas fa-brain" style="color: #9c27b0;"></i> AI Model Information
+    </h3>
+
+    {% if model_info.success %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px;">
+            <div style="font-size: 0.75rem; color: #6c757d; text-transform: uppercase; margin-bottom: 5px;">Algorithm</div>
+            <strong style="color: #212529;">Logistic Regression</strong>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px;">
+            <div style="font-size: 0.75rem; color: #6c757d; text-transform: uppercase; margin-bottom: 5px;">Training Samples</div>
+            <strong style="color: #212529;">{{ model_info.samples }}</strong>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px;">
+            <div style="font-size: 0.75rem; color: #6c757d; text-transform: uppercase; margin-bottom: 5px;">Accuracy</div>
+            <strong style="color: #4caf50;">{{ model_info.accuracy }}%</strong>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px;">
+            <div style="font-size: 0.75rem; color: #6c757d; text-transform: uppercase; margin-bottom: 5px;">Came / Not Came</div>
+            <strong style="color: #212529;">{{ model_info.came }} / {{ model_info.not_came }}</strong>
+        </div>
+    </div>
+    <p style="margin-top: 20px; font-size: 0.85rem; color: #6c757d;">
+        <i class="fas fa-info-circle"></i> The model uses <strong>8 features</strong> to predict no-shows:
+        age, day of week, time of day, lead time, past no-shows, service type, symptoms, and booking hour.
+    </p>
+    {% else %}
+    <p style="color: #ff9800;">
+        <i class="fas fa-exclamation-triangle"></i> {{ model_info.error }} ({{ model_info.samples|default:0 }}/10 samples)
+    </p>
+    {% endif %}
+</div>
+
+{% endblock %}

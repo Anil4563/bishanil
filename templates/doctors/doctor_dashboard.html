@@ -1,0 +1,810 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Doctor Dashboard - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome, Dr. {{ doctor.name }}</h1>
+            <p>Manage your patients, appointments, and prescriptions</p>
+            <div class="approval-status">
+                {% if doctor.is_approved %}
+                <span class="approved-badge">✓ Approved</span>
+                {% else %}
+                <span class="pending-badge">⏳ Pending Approval</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Sidebar Menu -->
+            <div class="dashboard-sidebar">
+                <div class="doctor-card">
+                    {% if doctor.profile_image %}
+                    <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                    {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    {% endif %}
+                    <h3>Dr. {{ doctor.name }}</h3>
+                    <p>{{ doctor.specialization }}</p>
+                    <p class="fee">Consultation: ₹{{ doctor.consultation_fee }}</p>
+                </div>
+
+                <div class="sidebar-menu">
+                    <a href="#" class="menu-item active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="#" class="menu-item" data-tab="appointments">
+                        <i class="fas fa-calendar-alt"></i> My Appointments
+                    </a>
+                    <a href="#" class="menu-item" data-tab="patients">
+                        <i class="fas fa-users"></i> My Patients
+                    </a>
+                    <a href="#" class="menu-item" data-tab="prescriptions">
+                        <i class="fas fa-prescription-bottle"></i> Prescriptions
+                    </a>
+                    <a href="#" class="menu-item" data-tab="profile">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="dashboard-content">
+                <!-- Dashboard Tab -->
+                <div id="dashboard-tab" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <h3>{{ appointment_count }}</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <h3>{{ patient_count|default:"0" }}</h3>
+                            <p>Total Patients</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-file-prescription"></i>
+                            <h3>{{ prescription_count|default:"0" }}</h3>
+                            <p>Prescriptions</p>
+                        </div>
+                    </div>
+
+                    <div class="recent-appointments">
+                        <h3>Recent Appointments</h3>
+                        {% if appointments %}
+                        <div class="appointments-list">
+                            {% for appointment in appointments %}
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <span class="patient-name">{{ appointment.patient_name }}</span>
+                                    <span class="date">{{ appointment.appointment_date }}</span>
+                                    <span class="time">{{ appointment.appointment_time|time:"g:i A" }}</span>
+                                    <span class="status {{ appointment.status }}">{{ appointment.get_status_display }}</span>
+                                </div>
+                                <div class="appointment-actions">
+                                    <button class="btn-view" onclick="viewPatient('{{ appointment.patient_email }}')">View</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p>No appointments yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Appointments Tab -->
+                <div id="appointments-tab" class="tab-content">
+                    <h3>All Appointments</h3>
+                    <div class="appointments-list">
+                        {% for appointment in all_appointments %}
+                        <div class="appointment-item">
+                            <div class="appointment-info">
+                                <span class="patient-name">{{ appointment.patient_name }}</span>
+                                <span class="date">{{ appointment.appointment_date }}</span>
+                                <span class="time">{{ appointment.appointment_time|time:"g:i A" }}</span>
+                                <span class="status {{ appointment.status }}">{{ appointment.get_status_display }}</span>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="btn-view" onclick="viewPatient('{{ appointment.patient_email }}')">View Details</button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No appointments found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Patients Tab -->
+                <div id="patients-tab" class="tab-content">
+                    <h3>My Patients</h3>
+                    <div class="patients-list">
+                        {% for patient in patients %}
+                        <div class="patient-item">
+                            <div class="patient-info">
+                                <span class="patient-name">{{ patient.patient_name }}</span>
+                                <span class="patient-email">{{ patient.patient_email }}</span>
+                                <span class="patient-phone">{{ patient.patient_phone }}</span>
+                                <span class="appointment-count">{{ patient.appointment_count }} visits</span>
+                            </div>
+                            <div class="patient-actions">
+                                <button class="btn-view" onclick="viewPatient('{{ patient.patient_email }}')">View Details</button>
+                                <button class="btn-prescribe" onclick="givePrescription('{{ patient.patient_name }}', '{{ patient.patient_email }}', '{{ patient.patient_phone }}')">Give Prescription</button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No patients yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Prescriptions Tab -->
+                <div id="prescriptions-tab" class="tab-content">
+                    <h3>My Prescriptions</h3>
+                    <div class="prescriptions-list">
+                        {% for prescription in prescriptions %}
+                        <div class="prescription-item">
+                            <div class="prescription-info">
+                                <span class="patient-name">{{ prescription.patient_name }}</span>
+                                <span class="date">{{ prescription.created_at|date:"F d, Y" }}</span>
+                                <span class="diagnosis">{{ prescription.diagnosis|truncatechars:50 }}</span>
+                            </div>
+                            <div class="prescription-actions">
+                                <button class="btn-view" onclick="viewPrescription({{ prescription.id }})">View</button>
+                                <button class="btn-print" onclick="printPrescription({{ prescription.id }})">Print</button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No prescriptions yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Edit Profile Tab -->
+                <div id="profile-tab" class="tab-content">
+                    <h3>Edit Profile</h3>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label>Full Name</label>
+                                <input type="text" name="name" value="{{ doctor.name }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Specialization</label>
+                                <input type="text" name="specialization" value="{{ doctor.specialization }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label>Experience (Years)</label>
+                                <input type="number" name="experience_years" value="{{ doctor.experience_years }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Consultation Fee (₹)</label>
+                                <input type="number" name="consultation_fee" value="{{ doctor.consultation_fee }}">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label>Qualifications</label>
+                            <textarea name="qualifications" rows="3">{{ doctor.qualifications }}</textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Areas of Expertise</label>
+                            <textarea name="expertise" rows="3">{{ doctor.expertise }}</textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Bio</label>
+                            <textarea name="bio" rows="4">{{ doctor.bio }}</textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Profile Image</label>
+                            <input type="file" name="profile_image">
+                            {% if doctor.profile_image %}
+                            <small>Current: {{ doctor.profile_image.name }}</small>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Prescription Modal -->
+<div id="prescriptionModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closePrescriptionModal()">&times;</span>
+        <h3>Give Prescription</h3>
+
+        <div class="form-field">
+            <label>Patient Name</label>
+            <input type="text" id="prescription_patient_name" readonly>
+        </div>
+        <div class="form-field">
+            <label>Patient Email</label>
+            <input type="email" id="prescription_patient_email" readonly>
+        </div>
+        <div class="form-field">
+            <label>Patient Phone</label>
+            <input type="text" id="prescription_patient_phone">
+        </div>
+        <div class="form-field">
+            <label>Diagnosis / Condition *</label>
+            <textarea id="prescription_diagnosis" rows="3" required placeholder="Describe the diagnosis..."></textarea>
+        </div>
+        <div class="form-field">
+            <label>Medicines with Dosage *</label>
+            <textarea id="prescription_medicines" rows="4" required placeholder="Example:&#10;1. Paracetamol 500mg - Twice daily after meal for 5 days&#10;2. Amoxicillin 250mg - Three times daily for 7 days"></textarea>
+        </div>
+        <div class="form-field">
+            <label>Additional Instructions</label>
+            <textarea id="prescription_instructions" rows="3" placeholder="Dietary restrictions, precautions, etc."></textarea>
+        </div>
+        <div class="form-field">
+            <label>
+                <input type="checkbox" id="prescription_followup"> Follow-up Required
+            </label>
+        </div>
+        <div class="form-field" id="followup_date_field" style="display: none;">
+            <label>Follow-up Date</label>
+            <input type="date" id="prescription_followup_date">
+        </div>
+
+        <div class="modal-buttons">
+            <button onclick="submitPrescription()" class="btn-primary">Save Prescription</button>
+            <button onclick="closePrescriptionModal()" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+        min-height: 80vh;
+    }
+
+    .dashboard-header h1 {
+        color: var(--teal);
+        margin-bottom: 10px;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 30px;
+    }
+
+    .doctor-card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .doctor-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+    }
+
+    .avatar-placeholder i {
+        font-size: 5rem;
+        color: var(--teal);
+    }
+
+    .sidebar-menu {
+        background: var(--white);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        color: var(--dark);
+        text-decoration: none;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+        background: var(--teal-bg);
+        color: var(--teal);
+        border-left-color: var(--teal);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+    }
+
+    .stat-card i {
+        font-size: 2rem;
+        color: var(--teal);
+        margin-bottom: 10px;
+    }
+
+    .stat-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .appointment-item,
+    .patient-item,
+    .prescription-item {
+        background: var(--white);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .status {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+    }
+
+    .status.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status.confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status.completed {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .btn-view,
+    .btn-prescribe,
+    .btn-print {
+        padding: 5px 12px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        margin: 2px;
+    }
+
+    .btn-view {
+        background: var(--teal);
+        color: white;
+    }
+
+    .btn-prescribe {
+        background: #ff9800;
+        color: white;
+    }
+
+    .btn-print {
+        background: #6c757d;
+        color: white;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+
+    .form-field label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .form-field input,
+    .form-field textarea {
+        padding: 10px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 8px;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+            margin: 20px;
+            transform: none;
+            top: 0;
+        }
+    }
+</style>
+
+<script>
+    // Tab switching
+    function switchToTab(tabName) {
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+        const menuItem = document.querySelector(`.menu-item[data-tab="${tabName}"]`);
+        if (menuItem) menuItem.classList.add('active');
+
+        const tabElement = document.getElementById(tabName + '-tab');
+        if (tabElement) tabElement.classList.add('active');
+    }
+
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const tabName = this.getAttribute('data-tab');
+            switchToTab(tabName);
+            history.pushState(null, null, `#${tabName}`);
+        });
+    });
+
+    function handleHash() {
+        const hash = window.location.hash.substring(1);
+        const validTabs = ['dashboard', 'appointments', 'patients', 'prescriptions', 'profile'];
+        if (hash && validTabs.includes(hash)) {
+            switchToTab(hash);
+        } else {
+            switchToTab('dashboard');
+        }
+    }
+
+    window.addEventListener('hashchange', handleHash);
+    handleHash();
+
+    // Follow-up date toggle
+    const followupCheckbox = document.getElementById('prescription_followup');
+    if (followupCheckbox) {
+        followupCheckbox.addEventListener('change', function () {
+            const field = document.getElementById('followup_date_field');
+            if (field) field.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+
+    // View Patient Details
+  function viewPatient(email) {
+    let modal = document.getElementById('patientDetailsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'patientDetailsModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 750px;">
+                <span class="close" onclick="closePatientModal()">&times;</span>
+                <h3>Patient Details</h3>
+                <div id="patientDetailsContent" style="padding: 20px;">Loading...</div>
+                <div style="padding: 0 20px 20px 20px; text-align: center; border-top: 1px solid #eee;">
+                    <button onclick="showSimilarFromPatient('${email}')" style="background: linear-gradient(135deg, #9c27b0, #6a1b9a); color: white; padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; font-family: inherit;">
+                        <i class="fas fa-brain"></i> Find Similar Patients (AI)
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    modal.style.display = 'block';
+    document.getElementById('patientDetailsContent').innerHTML = '<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+    fetch(`/doctors/patient-details/${encodeURIComponent(email)}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('patientDetailsContent').innerHTML = `<div style="color:red; padding:20px;">Error: ${data.error}</div>`;
+                return;
+            }
+            if (!data.success) {
+                document.getElementById('patientDetailsContent').innerHTML = `<div style="color:red; padding:20px;">Failed to load patient data</div>`;
+                return;
+            }
+
+            let html = `
+                <div class="patient-details" style="max-height: 60vh; overflow-y: auto;">
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #26a69a; margin-bottom: 10px;">📋 Patient Information</h4>
+                        <p><strong>Name:</strong> ${data.patient.name || 'N/A'}</p>
+                        <p><strong>Email:</strong> ${data.patient.email || 'N/A'}</p>
+                        <p><strong>Phone:</strong> ${data.patient.phone || 'N/A'}</p>
+                        <p><strong>Age:</strong> ${data.patient.age || 'N/A'}</p>
+                        <p><strong>Total Appointments:</strong> ${data.total_appointments}</p>
+                        <p><strong>Total Prescriptions:</strong> ${data.total_prescriptions}</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #26a69a; margin-bottom: 10px;">📅 Appointment History</h4>
+                        <div style="max-height: 200px; overflow-y: auto;">
+            `;
+
+            if (data.appointments && data.appointments.length > 0) {
+                data.appointments.forEach(apt => {
+                    html += `<div style="padding: 8px; border-bottom: 1px solid #eee;">${apt.date} | ${apt.time} | ${apt.service} | <span style="background: #e9ecef; padding: 2px 8px; border-radius: 20px; font-size: 12px;">${apt.status}</span></div>`;
+                });
+            } else {
+                html += '<p>No appointments found.</p>';
+            }
+
+            html += `</div></div><div style="margin-bottom: 20px;"><h4 style="color: #26a69a; margin-bottom: 10px;">💊 Prescription History</h4><div style="max-height: 200px; overflow-y: auto;">`;
+
+            if (data.prescriptions && data.prescriptions.length > 0) {
+                data.prescriptions.forEach(pres => {
+                    html += `
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                            <div><strong>${pres.date}</strong></div>
+                            <div><strong>Diagnosis:</strong> ${pres.diagnosis}</div>
+                            <div><strong>Medicines:</strong> ${pres.medicines}</div>
+                            <button class="btn-view" onclick="window.open('/doctors/print-prescription/${pres.id}/', '_blank')">Print</button>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p>No prescriptions found.</p>';
+            }
+
+            html += `</div></div></div>`;
+            document.getElementById('patientDetailsContent').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('patientDetailsContent').innerHTML = `<div style="color:red; padding:20px;">Error loading patient details: ${error.message}</div>`;
+        });
+}
+
+
+function showSimilarFromPatient(email) {
+    // Create a sub-modal inside the patient details modal
+    let similarDiv = document.getElementById('similarPatientsSubModal');
+    if (!similarDiv) {
+        similarDiv = document.createElement('div');
+        similarDiv.id = 'similarPatientsSubModal';
+        similarDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2100; overflow-y: auto; display: none;';
+        similarDiv.innerHTML = `
+            <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 20px; padding: 35px; position: relative;">
+                <span onclick="closeSimilarSubModal()" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer;">&times;</span>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                    <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #9c27b0, #6a1b9a); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.6rem;">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: #9c27b0;">Similar Patients (AI)</h2>
+                        <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 0.9rem;">K-Nearest Neighbors analysis</p>
+                    </div>
+                </div>
+                <div id="similarPatientsSubContent" style="min-height: 100px;">
+                    <p style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(similarDiv);
+    }
+
+    similarDiv.style.display = 'block';
+    const container = document.getElementById('similarPatientsSubContent');
+    container.innerHTML = '<p style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-spinner fa-spin"></i> Analyzing...</p>';
+
+    fetch(`/doctors/similar-patients/${encodeURIComponent(email)}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                container.innerHTML = `<p style="text-align: center; padding: 30px; color: #f44336;">Error: ${data.error || 'Failed to load'}</p>`;
+                return;
+            }
+
+            if (data.patients.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 30px; color: #6c757d;">No similar patients found.</p>';
+                return;
+            }
+
+            let html = '<div style="display: grid; gap: 15px;">';
+
+            data.patients.forEach((p) => {
+                const matchColor = p.similarity >= 80 ? '#4caf50' : (p.similarity >= 60 ? '#ff9800' : '#6c757d');
+
+                let badges = '';
+                if (p.diabetes) badges += '<span style="background: #f8d7da; color: #721c24; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin: 2px;">Diabetes</span>';
+                if (p.thyroid) badges += '<span style="background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin: 2px;">Thyroid</span>';
+                if (p.asthma) badges += '<span style="background: #cce5ff; color: #004085; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin: 2px;">Asthma</span>';
+                if (p.heart_disease) badges += '<span style="background: #f8d7da; color: #721c24; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin: 2px;">Heart Disease</span>';
+
+                html += `
+                    <div style="background: #f8f9fa; padding: 18px 20px; border-radius: 15px; border-left: 5px solid ${matchColor}; display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #9c27b0, #6a1b9a); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
+                            ${p.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 6px;">
+                                <strong style="font-size: 1rem; color: #212529;">${p.name}</strong>
+                                <span style="background: ${matchColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                                    ${p.similarity}% match
+                                </span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 6px;">
+                                <i class="fas fa-envelope"></i> ${p.email} &nbsp;|&nbsp;
+                                <i class="fas fa-phone"></i> ${p.phone} &nbsp;|&nbsp;
+                                <i class="fas fa-tint"></i> ${p.blood_group}
+                            </div>
+                            <div style="font-size: 0.8rem; color: #495057; margin-bottom: 6px;">
+                                <i class="fas fa-lightbulb" style="color: #ff9800;"></i> <strong>Why similar:</strong> ${p.reason}
+                            </div>
+                            <div>${badges}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            container.innerHTML = `<p style="text-align: center; padding: 30px; color: #f44336;">Error loading data.</p>`;
+        });
+}
+
+function closeSimilarSubModal() {
+    const div = document.getElementById('similarPatientsSubModal');
+    if (div) div.style.display = 'none';
+}
+    function closePatientModal() {
+        const modal = document.getElementById('patientDetailsModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function givePrescription(name, email, phone) {
+        document.getElementById('prescriptionModal').style.display = 'block';
+        document.getElementById('prescription_patient_name').value = name;
+        document.getElementById('prescription_patient_email').value = email;
+        document.getElementById('prescription_patient_phone').value = phone || '';
+        document.getElementById('prescription_diagnosis').value = '';
+        document.getElementById('prescription_medicines').value = '';
+        document.getElementById('prescription_instructions').value = '';
+        document.getElementById('prescription_followup').checked = false;
+        document.getElementById('followup_date_field').style.display = 'none';
+        document.getElementById('prescription_followup_date').value = '';
+    }
+
+    function closePrescriptionModal() {
+        document.getElementById('prescriptionModal').style.display = 'none';
+    }
+
+    function submitPrescription() {
+        const data = {
+            patient_name: document.getElementById('prescription_patient_name').value,
+            patient_email: document.getElementById('prescription_patient_email').value,
+            patient_phone: document.getElementById('prescription_patient_phone').value,
+            diagnosis: document.getElementById('prescription_diagnosis').value,
+            medicines: document.getElementById('prescription_medicines').value,
+            instructions: document.getElementById('prescription_instructions').value,
+            follow_up_required: document.getElementById('prescription_followup').checked,
+            follow_up_date: document.getElementById('prescription_followup_date').value
+        };
+
+        fetch('/doctors/give-prescription/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Prescription saved successfully!');
+                closePrescriptionModal();
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    }
+
+    function viewPrescription(id) {
+        fetch(`/doctors/view-prescription/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) alert(data.error);
+                else alert(`Patient: ${data.patient_name}\nDate: ${data.created_at}\n\nDiagnosis:\n${data.diagnosis}\n\nMedicines:\n${data.medicines}\n\nInstructions:\n${data.instructions || 'None'}`);
+            });
+    }
+
+    function printPrescription(id) {
+        window.open(`/doctors/print-prescription/${id}/`, '_blank');
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

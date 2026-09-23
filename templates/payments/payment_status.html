@@ -1,0 +1,219 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Payment Status - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="status-section">
+    <div class="container">
+        <div class="status-card {% if transaction.status == 'completed' %}success{% elif transaction.status == 'failed' %}failed{% else %}pending{% endif %}">
+            <div class="status-icon">
+                {% if transaction.status == 'completed' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif transaction.status == 'failed' %}
+                <i class="fas fa-times-circle"></i>
+                {% else %}
+                <i class="fas fa-clock"></i>
+                {% endif %}
+            </div>
+            
+            <h1>
+                {% if transaction.status == 'completed' %}
+                Payment Successful!
+                {% elif transaction.status == 'failed' %}
+                Payment Failed
+                {% else %}
+                Payment Pending
+                {% endif %}
+            </h1>
+            
+            <div class="transaction-details">
+                <div class="detail-item">
+                    <label>Transaction ID:</label>
+                    <span>{{ transaction.transaction_id }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Invoice Number:</label>
+                    <span>{{ transaction.invoice_number|default:"Generating..." }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Amount:</label>
+                    <span>Rs. {{ transaction.amount }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Payment Method:</label>
+                    <span>{{ transaction.get_payment_method_display }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Date:</label>
+                    <span>{{ transaction.paid_at|date:"F d, Y h:i A"|default:transaction.created_at|date:"F d, Y h:i A" }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Status:</label>
+                    <span class="status-badge {{ transaction.status }}">{{ transaction.get_status_display }}</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                {% if transaction.status == 'completed' %}
+                <a href="{% url 'payments:download_invoice' transaction.invoice_number %}" class="btn-primary" target="_blank">
+                    <i class="fas fa-download"></i> Download Invoice
+                </a>
+                {% endif %}
+                <a href="{% url 'accounts:my_appointments' %}" class="btn-secondary">
+                    <i class="fas fa-calendar-alt"></i> View Appointments
+                </a>
+                <a href="/" class="btn-outline">
+                    <i class="fas fa-home"></i> Go Home
+                </a>
+            </div>
+            
+            {% if transaction.status == 'completed' %}
+            <div class="next-steps">
+                <h3>What's Next?</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Your appointment has been confirmed</li>
+                    <li><i class="fas fa-check"></i> You will receive a confirmation SMS/Email</li>
+                    <li><i class="fas fa-check"></i> Please arrive 10 minutes before your appointment</li>
+                    <li><i class="fas fa-check"></i> Bring any previous medical reports if available</li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .status-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .status-card {
+        max-width: 550px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .status-icon i {
+        font-size: 5rem;
+        margin-bottom: 20px;
+    }
+    
+    .status-card.success .status-icon i {
+        color: #4caf50;
+    }
+    
+    .status-card.failed .status-icon i {
+        color: #f44336;
+    }
+    
+    .status-card.pending .status-icon i {
+        color: #ff9800;
+    }
+    
+    .status-card h1 {
+        margin-bottom: 30px;
+        font-size: 1.8rem;
+    }
+    
+    .transaction-details {
+        background: var(--gray-light);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-item label {
+        font-weight: 600;
+        color: var(--dark);
+    }
+    
+    .status-badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge.completed {
+        background: #4caf50;
+        color: white;
+    }
+    
+    .status-badge.pending {
+        background: #ff9800;
+        color: white;
+    }
+    
+    .status-badge.failed {
+        background: #f44336;
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+    
+    .next-steps {
+        background: var(--teal-bg);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: left;
+    }
+    
+    .next-steps h3 {
+        color: var(--teal);
+        margin-bottom: 15px;
+    }
+    
+    .next-steps ul {
+        list-style: none;
+    }
+    
+    .next-steps li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .next-steps li i {
+        color: var(--teal);
+    }
+    
+    @media (max-width: 768px) {
+        .status-card {
+            margin: 0 20px;
+            padding: 25px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

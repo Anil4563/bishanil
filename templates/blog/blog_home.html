@@ -1,0 +1,305 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Blog - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our <span>Blog</span></h1>
+        <p>Expert insights on dental and eye care</p>
+    </div>
+</section>
+
+<!-- Featured Posts -->
+{% if featured_posts %}
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Featured <span>Articles</span></h2>
+        </div>
+        <div class="featured-grid">
+            {% for post in featured_posts %}
+            <div class="featured-card">
+                {% if post.featured_image %}
+                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                {% endif %}
+                <div class="featured-content">
+                    <span class="post-category">{{ post.get_post_type_display }}</span>
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <p>{{ post.excerpt|truncatechars:120 }}</p>
+                    <div class="post-meta">
+                        <span><i class="fas fa-user"></i> {{ post.author_name }}</span>
+                        <span><i class="fas fa-calendar"></i> {{ post.published_at|date:"M d, Y" }}</span>
+                        <span><i class="fas fa-clock"></i> {{ post.reading_time }} min read</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Filter Buttons -->
+<section class="filter-section">
+    <div class="container">
+        <div class="filter-buttons">
+            <a href="{% url 'blog:blog_home' %}" class="filter-btn {% if not current_type %}active{% endif %}">All</a>
+            <a href="?type=dental" class="filter-btn {% if current_type == 'dental' %}active{% endif %}">🦷 Dental Care</a>
+            <a href="?type=eye" class="filter-btn {% if current_type == 'eye' %}active{% endif %}">👁️ Eye Care</a>
+            <a href="?type=tips" class="filter-btn {% if current_type == 'tips' %}active{% endif %}">💡 Health Tips</a>
+            <a href="?type=news" class="filter-btn {% if current_type == 'news' %}active{% endif %}">📰 Clinic News</a>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Posts Grid -->
+<section class="blog-section">
+    <div class="container">
+        <div class="blog-grid">
+            {% for post in page_obj %}
+            <div class="blog-card">
+                {% if post.featured_image %}
+                <div class="blog-image">
+                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                    <span class="post-type">{{ post.get_post_type_display }}</span>
+                </div>
+                {% endif %}
+                <div class="blog-content">
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <div class="post-meta">
+                        <span><i class="fas fa-calendar"></i> {{ post.published_at|date:"M d, Y" }}</span>
+                        <span><i class="fas fa-clock"></i> {{ post.reading_time }} min read</span>
+                        <span><i class="fas fa-eye"></i> {{ post.views }}</span>
+                    </div>
+                    <p>{{ post.excerpt|truncatechars:100 }}</p>
+                    <a href="{{ post.get_absolute_url }}" class="read-more">Read More →</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>No blog posts found.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}" class="page-link">← Previous</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="page-link active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}{% if current_type %}&type={{ current_type }}{% endif %}" class="page-link">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}" class="page-link">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .featured-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
+    
+    .featured-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    
+    .featured-card {
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+    
+    .featured-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .featured-card img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+    }
+    
+    .featured-content {
+        padding: 25px;
+    }
+    
+    .post-category {
+        display: inline-block;
+        background: var(--teal-bg);
+        color: var(--teal);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-bottom: 12px;
+    }
+    
+    .filter-section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+    
+    .filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 8px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        color: var(--dark);
+        background: var(--white);
+        border: 1px solid var(--gray-medium);
+        transition: var(--transition);
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+        background: var(--teal);
+        color: var(--white);
+        border-color: var(--teal);
+    }
+    
+    .blog-section {
+        padding: 60px 0;
+    }
+    
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+    }
+    
+    .blog-card {
+        background: var(--white);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .blog-image {
+        position: relative;
+        height: 200px;
+    }
+    
+    .blog-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .post-type {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--teal);
+        color: var(--white);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .blog-content {
+        padding: 20px;
+    }
+    
+    .blog-content h3 a {
+        text-decoration: none;
+        color: var(--dark);
+        transition: var(--transition);
+    }
+    
+    .blog-content h3 a:hover {
+        color: var(--teal);
+    }
+    
+    .post-meta {
+        display: flex;
+        gap: 15px;
+        margin: 12px 0;
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+    
+    .read-more {
+        display: inline-block;
+        margin-top: 15px;
+        color: var(--teal);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 50px;
+    }
+    
+    .page-link {
+        padding: 8px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--dark);
+        transition: var(--transition);
+    }
+    
+    .page-link:hover, .page-link.active {
+        background: var(--teal);
+        color: var(--white);
+        border-color: var(--teal);
+    }
+    
+    @media (max-width: 768px) {
+        .featured-grid, .blog-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-buttons {
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}

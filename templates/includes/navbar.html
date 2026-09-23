@@ -1,0 +1,555 @@
+{% load static %}
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container">
+        <div class="top-bar-content">
+            <div class="contact-info">
+                {% with contact_settings as cs %}
+                {% if cs and cs.phone_primary %}
+                <a href="tel:{{ cs.phone_primary }}"><i class="fas fa-phone-alt"></i> {{ cs.phone_primary }}</a>
+                {% else %}
+                <a href="tel:+9779800000000"><i class="fas fa-phone-alt"></i> +977 9800000000</a>
+                {% endif %}
+
+                {% if cs and cs.email_primary %}
+                <a href="mailto:{{ cs.email_primary }}"><i class="fas fa-envelope"></i> {{ cs.email_primary }}</a>
+                {% else %}
+                <a href="mailto:info@bishanildental.com"><i class="fas fa-envelope"></i> info@bishanildental.com</a>
+                {% endif %}
+
+                {% if cs and cs.address %}
+                <span><i class="fas fa-map-marker-alt"></i> {{ cs.address }}</span>
+                {% else %}
+                <span><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</span>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="top-social-links">
+                {% with contact_settings as cs %}
+                {% if cs and cs.facebook_url %}
+                <a href="{{ cs.facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                {% endif %}
+                {% if cs and cs.instagram_url %}
+                <a href="{{ cs.instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                {% endif %}
+                {% if cs and cs.twitter_url %}
+                <a href="{{ cs.twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                {% endif %}
+                {% if cs and cs.linkedin_url %}
+                <a href="{{ cs.linkedin_url }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                {% endif %}
+                {% if cs and cs.youtube_url %}
+                <a href="{{ cs.youtube_url }}" target="_blank"><i class="fab fa-youtube"></i></a>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Navbar -->
+<nav class="main-navbar">
+    <div class="container">
+        <div class="navbar-wrapper">
+            <a href="/" class="logo">
+                <img src="{% static 'images/logo11.jpg' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">
+                    <span>Bishanil <span class="accent">Dental</span></span>
+                    <small>& Eye Care</small>
+                </div>
+            </a>
+
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
+                <li><a href="/dental/services/">Dental</a></li>
+                <li><a href="/eyecare/services/">EyeCare</a></li>
+                <li><a href="/doctors/">Doctors</a></li>
+                <li><a href="/gallery/">Gallery</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/contact/">Contact</a></li>
+
+                <!-- Emergency Button -->
+                {% if user.is_authenticated %}
+                <li><a href="/appointments/emergency/" class="emergency-link">Emergency</a></li>
+                {% else %}
+                <li><a href="{% url 'accounts:login' %}" class="emergency-link-outline">Emergency</a></li>
+                {% endif %}
+
+                <!-- Account Dropdown -->
+                {% if user.is_authenticated %}
+                    {% if user.doctor_profile and user.doctor_profile.is_approved %}
+                    <!-- Doctor Logged In -->
+                    <li class="dropdown">
+                        <a href="#" class="user-menu-btn">
+                            <i class="fas fa-user-md"></i> {{ user.doctor_profile.name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url 'doctors:doctor_dashboard' %}"><i class="fas fa-chart-line"></i> Doctor Dashboard</a></li>
+                            <li><a href="{% url 'doctors:doctor_dashboard' %}#appointments"><i class="fas fa-calendar-alt"></i> My Appointments</a></li>
+                            <li><a href="{% url 'doctors:doctor_dashboard' %}#patients"><i class="fas fa-users"></i> My Patients</a></li>
+                            <li><a href="{% url 'doctors:doctor_dashboard' %}#prescriptions"><i class="fas fa-prescription-bottle"></i> Prescriptions</a></li>
+                            <li><a href="{% url 'doctors:doctor_dashboard' %}#profile"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <!-- Patient Logged In (Also shows for Admin) -->
+                    <li class="dropdown">
+                        <a href="#" class="user-menu-btn">
+                            <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_staff %}
+                            <li><a href="{% url 'dashboard:admin_dashboard' %}"><i class="fas fa-chart-pie"></i> Admin Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a href="{% url 'accounts:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Patient Dashboard</a></li>
+                            <li><a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                            <li><a href="{% url 'accounts:my_appointments' %}"><i class="fas fa-calendar-alt"></i> My Appointments</a></li>
+                            <li><a href="{% url 'accounts:dashboard' %}#medical"><i class="fas fa-notes-medical"></i> Medical History</a></li>
+                            <li><a href="{% url 'accounts:dashboard' %}#bills"><i class="fas fa-file-invoice"></i> My Bills</a></li>
+                            {% if user.is_staff %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="/admin/" target="_blank"><i class="fas fa-cog"></i> Django Admin</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <!-- Not Logged In -->
+                <li class="auth-dropdown">
+                    <a href="#" class="auth-oval-btn">
+                        <i class="fas fa-user"></i> Account
+                    </a>
+                    <ul class="auth-dropdown-menu">
+                        <li><a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt"></i> Patient Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus"></i> Patient Register</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="{% url 'doctors:doctor_login' %}"><i class="fas fa-user-md"></i> Doctor Login</a></li>
+                        <li><a href="{% url 'doctors:doctor_register' %}"><i class="fas fa-stethoscope"></i> Become a Doctor</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    /* Professional Navbar Styles */
+    .top-bar {
+        background: var(--teal);
+        padding: 6px 0;
+        font-size: 0.75rem;
+    }
+
+    .top-bar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .contact-info {
+        display: flex;
+        gap: 20px;
+    }
+
+    .contact-info a {
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.3s;
+    }
+
+    .contact-info a:hover {
+        opacity: 0.85;
+    }
+
+    .top-social-links {
+        display: flex;
+        gap: 12px;
+    }
+
+    .top-social-links a {
+        color: white;
+        transition: opacity 0.3s;
+    }
+
+    .top-social-links a:hover {
+        opacity: 0.85;
+    }
+
+    /* Main Navbar */
+    .main-navbar {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .navbar-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        gap: 30px;
+    }
+
+    /* Logo */
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .logo-img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+    .logo-text span {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .logo-text .accent {
+        color: #26a69a;
+    }
+
+    .logo-text small {
+        font-size: 0.65rem;
+        color: #6c757d;
+    }
+
+    /* Navigation Menu */
+    .nav-menu {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-menu>li>a {
+        padding: 8px 16px;
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        border-radius: 6px;
+    }
+
+    .nav-menu>li>a:hover {
+        color: var(--teal);
+        background: var(--teal-bg);
+    }
+
+    .nav-menu>li>a.active {
+        color: var(--teal);
+        background: var(--teal-bg);
+    }
+
+    /* Emergency Link Styles */
+    .emergency-link {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white !important;
+        border-radius: 50px !important;
+        padding: 6px 16px !important;
+    }
+
+    .emergency-link:hover {
+        background: linear-gradient(135deg, #ee5a24, #ff6b6b);
+        color: white !important;
+    }
+
+    .emergency-link-outline {
+        border: 1.5px solid #ff6b6b;
+        color: #ff6b6b !important;
+        border-radius: 50px !important;
+        padding: 6px 16px !important;
+    }
+
+    .emergency-link-outline:hover {
+        background: #ff6b6b;
+        color: white !important;
+    }
+
+    /* Auth Oval Button */
+    .auth-dropdown {
+        position: relative;
+    }
+
+    .auth-oval-btn {
+        background: linear-gradient(135deg, #26a69a 0%, #1e847a 100%);
+        color: white !important;
+        padding: 8px 20px !important;
+        border-radius: 50px !important;
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+
+    .auth-oval-btn:hover {
+        background: linear-gradient(135deg, #1e847a 0%, #156b62 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3);
+        color: white !important;
+    }
+
+    .auth-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        min-width: 200px;
+        padding: 8px 0;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s;
+        list-style: none;
+        z-index: 100;
+    }
+
+    .auth-dropdown:hover .auth-dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .auth-dropdown-menu li a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #495057;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+    }
+
+    .auth-dropdown-menu li a:hover {
+        background: rgba(38, 166, 154, 0.1);
+        color: #26a69a;
+        padding-left: 25px;
+    }
+
+    /* User Menu Button */
+    .user-menu-btn {
+        background: var(--teal-bg);
+        color: var(--teal) !important;
+        padding: 8px 20px !important;
+        border-radius: 50px !important;
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+
+    .user-menu-btn:hover {
+        background: var(--teal);
+        color: white !important;
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown>a {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        min-width: 220px;
+        padding: 8px 0;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s;
+        list-style: none;
+        z-index: 100;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-menu li a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        text-decoration: none;
+        color: #495057;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+    }
+
+    .dropdown-menu li a:hover {
+        background: rgba(38, 166, 154, 0.1);
+        color: #26a69a;
+        padding-left: 25px;
+    }
+
+    .dropdown-divider {
+        margin: 6px 0;
+        border: none;
+        border-top: 1px solid #e9ecef;
+    }
+
+    /* Menu Toggle */
+    .menu-toggle {
+        display: none;
+        font-size: 1.3rem;
+        cursor: pointer;
+        color: var(--teal);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .menu-toggle {
+            display: block;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 70px 20px 30px;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            right: 0;
+        }
+
+        .nav-menu>li {
+            width: 100%;
+        }
+
+        .nav-menu>li>a {
+            display: block;
+            padding: 12px 16px;
+        }
+
+        .dropdown-menu,
+        .auth-dropdown-menu {
+            position: static;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            box-shadow: none;
+            padding-left: 20px;
+            display: none;
+        }
+
+        .dropdown.active .dropdown-menu,
+        .auth-dropdown.active .auth-dropdown-menu {
+            display: block;
+        }
+
+        .top-bar-content {
+            justify-content: center;
+        }
+
+        .contact-info {
+            font-size: 0.7rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .contact-info {
+            gap: 10px;
+        }
+
+        .top-social-links {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function () {
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (window.innerWidth <= 992) {
+            if (!navMenu?.contains(event.target) && !menuToggle?.contains(event.target)) {
+                navMenu?.classList.remove('active');
+            }
+        }
+    });
+
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const link = dropdown.querySelector('> a');
+        link?.addEventListener('click', function (e) {
+            if (window.innerWidth <= 992) {
+                e.preventDefault();
+                dropdown.classList.toggle('active');
+            }
+        });
+    });
+
+    const authDropdown = document.querySelector('.auth-dropdown');
+    if (authDropdown) {
+        const authLink = authDropdown.querySelector('> a');
+        authLink?.addEventListener('click', function (e) {
+            if (window.innerWidth <= 992) {
+                e.preventDefault();
+                authDropdown.classList.toggle('active');
+            }
+        });
+    }
+</script>

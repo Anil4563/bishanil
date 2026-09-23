@@ -1,0 +1,104 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Achievements - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Our <span>Achievements</span></h1>
+        <p>Milestones and recognition we are proud of</p>
+    </div>
+</section>
+
+<section class="achievements-section">
+    <div class="container">
+        <div class="achievements-grid">
+            {% for achievement in achievements %}
+            <div class="achievement-card">
+                <div class="achievement-icon">
+                    <i class="{{ achievement.icon_class }}"></i>
+                </div>
+                <div class="achievement-year">{{ achievement.year }}</div>
+                <h3>{{ achievement.title }}</h3>
+                <p>{{ achievement.description }}</p>
+                {% if achievement.image %}
+                <img src="{{ achievement.image.url }}" alt="{{ achievement.title }}" class="achievement-image">
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>No achievements added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .achievements-section {
+        padding: 60px 0;
+    }
+    
+    .achievements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    .achievement-card {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-medium);
+    }
+    
+    .achievement-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--teal);
+    }
+    
+    .achievement-icon i {
+        font-size: 3rem;
+        color: var(--teal);
+        margin-bottom: 15px;
+    }
+    
+    .achievement-year {
+        background: var(--teal);
+        color: var(--white);
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+    
+    .achievement-card h3 {
+        margin-bottom: 15px;
+    }
+    
+    .achievement-card p {
+        color: var(--gray);
+        line-height: 1.6;
+    }
+    
+    .achievement-image {
+        margin-top: 15px;
+        border-radius: 10px;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}

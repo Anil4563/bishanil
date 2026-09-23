@@ -1,0 +1,786 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Dr. {{ doctor.name }} - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<!-- Doctor Header -->
+<section class="doctor-header">
+    <div class="container">
+        <div class="doctor-profile">
+            <div class="doctor-avatar">
+                {% if doctor.profile_image %}
+                <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                {% else %}
+                <i class="fas fa-user-md"></i>
+                {% endif %}
+            </div>
+            <div class="doctor-info">
+                <h1>Dr. {{ doctor.name }}</h1>
+                <p class="specialization">{{ doctor.specialization }}</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <span>{{ avg_rating|default:"0" }} ({{ total_reviews|default:"0" }} reviews)</span>
+                </div>
+                <div class="doctor-badges">
+                    <span class="badge"><i class="fas fa-briefcase"></i> {{ doctor.experience_years }} years</span>
+                    <span class="badge"><i class="fas fa-graduation-cap"></i> {{ doctor.get_degree_display }}</span>
+                    <span class="badge"><i class="fas fa-language"></i> {{ doctor.languages }}</span>
+                </div>
+            </div>
+            <div class="doctor-actions">
+                {% if user.is_authenticated %}
+                <a href="/appointments/book/" class="btn-primary">Book Appointment</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn-primary">Book Appointment</a>
+                {% endif %}
+                <div class="fee">Consultation: ₹{{ doctor.consultation_fee }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Doctor Details -->
+<section class="doctor-details">
+    <div class="container">
+        <div class="details-grid">
+            <div class="details-content">
+                <!-- Biography -->
+                <div class="bio">
+                    <h2>Biography</h2>
+                    <p>{{ doctor.bio|linebreaks }}</p>
+                </div>
+
+                <!-- Qualifications & Education -->
+                <div class="qualifications">
+                    <h2>Qualifications & Education</h2>
+                    <ul>
+                        {% if doctor.education %}
+                            {% if doctor.education is string %}
+                                <li><i class="fas fa-check-circle"></i> {{ doctor.education }}</li>
+                            {% else %}
+                                {% for edu in doctor.education %}
+                                <li><i class="fas fa-check-circle"></i> {{ edu }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <li><i class="fas fa-check-circle"></i> {{ doctor.qualifications|linebreaks }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Expertise -->
+                <div class="expertise">
+                    <h2>Areas of Expertise</h2>
+                    <p>{{ doctor.expertise|linebreaks }}</p>
+                </div>
+
+                <!-- Awards -->
+                <div class="awards">
+                    <h2>Awards & Achievements</h2>
+                    <ul>
+                        {% if doctor.awards %}
+                            {% if doctor.awards is string %}
+                                <li><i class="fas fa-trophy"></i> {{ doctor.awards }}</li>
+                            {% else %}
+                                {% for award in doctor.awards %}
+                                <li><i class="fas fa-trophy"></i> {{ award }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <li><i class="fas fa-trophy"></i> No awards listed</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Memberships -->
+                <div class="memberships">
+                    <h2>Professional Memberships</h2>
+                    <ul>
+                        {% if doctor.memberships %}
+                            {% if doctor.memberships is string %}
+                                <li><i class="fas fa-users"></i> {{ doctor.memberships }}</li>
+                            {% else %}
+                                {% for membership in doctor.memberships %}
+                                <li><i class="fas fa-users"></i> {{ membership }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <li><i class="fas fa-users"></i> No memberships listed</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Patient Reviews & Feedback Section -->
+                <div class="reviews-section">
+                    <h2>Patient Reviews & Feedback</h2>
+                    
+                    <!-- Rating Summary -->
+                    <div class="rating-summary">
+                        <div class="avg-rating">
+                            <span class="rating-number">{{ feedback_avg|default:avg_rating|default:"0" }}</span>
+                            <div class="stars">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= feedback_avg|default:avg_rating|default:0 %}
+                                    <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-count">({{ total_feedbacks|default:total_reviews|default:"0" }} reviews)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Patient Feedbacks from Feedback System -->
+                    {% if feedbacks %}
+                        {% for feedback in feedbacks %}
+                        <div class="review-card feedback-card">
+                            <div class="review-header">
+                                <strong>{{ feedback.name }}</strong>
+                                <div class="stars">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= feedback.rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p>{{ feedback.feedback_text }}</p>
+                            <div class="feedback-meta">
+                                <small><i class="fas fa-calendar"></i> {{ feedback.created_at|date:"F d, Y" }}</small>
+                                {% if feedback.treatment_received %}
+                                <small><i class="fas fa-stethoscope"></i> Treatment: {{ feedback.treatment_received }}</small>
+                                {% endif %}
+                            </div>
+                            {% if feedback.admin_response %}
+                            <div class="admin-response">
+                                <i class="fas fa-reply"></i>
+                                <p><strong>Doctor's Response:</strong> {{ feedback.admin_response }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Regular reviews from DoctorReview model -->
+                        {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <strong>{{ review.patient_name }}</strong>
+                                <div class="stars">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p>{{ review.review_text }}</p>
+                            <small>{{ review.created_at|date:"F d, Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p>No reviews yet. Be the first to leave feedback!</p>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <!-- Give Feedback Button -->
+                    <div class="give-feedback-btn">
+                        <a href="{% url 'feedback:feedback_page' %}" class="btn-outline">
+                            <i class="fas fa-star"></i> Leave Feedback for Dr. {{ doctor.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- Schedule -->
+                <div class="schedule-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Weekly Schedule</h3>
+                    <div class="schedule-list">
+                        {% if schedule %}
+                        {% regroup schedule by get_day_display as day_list %}
+                        {% for day in day_list %}
+                        <div class="schedule-item">
+                            <span class="day">{{ day.grouper }}</span>
+                            <span class="time">
+                                {% for slot in day.list %}
+                                {{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="no-schedule">Schedule not available. Please call for appointment.</p>
+                        {% endif %}
+                    </div>
+                    {% if doctor.availability %}
+                    <div class="availability-note">
+                        <i class="fas fa-clock"></i> {{ doctor.availability }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Book Appointment -->
+                <div class="book-card">
+                    <h3>Book Appointment</h3>
+                    <p>Secure your consultation with Dr. {{ doctor.name }}</p>
+                    {% if user.is_authenticated %}
+                    <a href="/appointments/book/" class="btn-primary">Book Now</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn-primary">Login to Book</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================
+     AI SIMILAR DOCTORS
+     ============================================ -->
+{% if similar_doctors %}
+<section class="similar-doctors-section">
+    <div class="container">
+        <div class="similar-header">
+            <span class="ai-badge-small">
+                <i class="fas fa-brain"></i> AI Suggested
+            </span>
+            <h2>Similar Doctors</h2>
+            <p>You might also like these specialists based on similarity analysis</p>
+        </div>
+
+        <div class="similar-grid">
+            {% for item in similar_doctors %}
+            <div class="similar-card">
+                <div class="similar-match">
+                    <i class="fas fa-percentage"></i>
+                    {{ item.similarity }}% match
+                </div>
+                
+                <div class="similar-image">
+                    {% if item.doctor.profile_image %}
+                    <img src="{{ item.doctor.profile_image.url }}" alt="{{ item.doctor.name }}">
+                    {% else %}
+                    <i class="fas fa-user-md"></i>
+                    {% endif %}
+                </div>
+                
+                <h3>Dr. {{ item.doctor.name }}</h3>
+                <p class="similar-specialty">{{ item.doctor.specialization }}</p>
+                
+                <div class="similar-stats">
+                    <span><i class="fas fa-briefcase"></i> {{ item.doctor.experience_years }} yrs</span>
+                    <span><i class="fas fa-money-bill"></i> Rs. {{ item.doctor.consultation_fee }}</span>
+                </div>
+                
+                <a href="{% url 'doctors:doctor_detail' item.doctor.slug %}" class="similar-btn">
+                    View Profile <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+</section>
+
+<style>
+    .doctor-header {
+        background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+        padding: 60px 0;
+        color: var(--white);
+    }
+
+    .doctor-profile {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .doctor-avatar {
+        width: 180px;
+        height: 180px;
+        background: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .doctor-avatar i {
+        font-size: 5rem;
+        color: var(--teal);
+    }
+
+    .doctor-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .doctor-info h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .specialization {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+
+    .rating {
+        margin-bottom: 15px;
+    }
+
+    .rating i {
+        color: #ffc107;
+    }
+
+    .doctor-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .doctor-actions {
+        text-align: center;
+    }
+
+    .doctor-actions .btn-primary {
+        background: var(--white);
+        color: var(--teal);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .fee {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .doctor-details {
+        padding: 60px 0;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 40px;
+    }
+
+    .bio,
+    .qualifications,
+    .expertise,
+    .awards,
+    .memberships,
+    .reviews-section {
+        margin-bottom: 40px;
+    }
+
+    .bio h2,
+    .qualifications h2,
+    .expertise h2,
+    .awards h2,
+    .memberships h2,
+    .reviews-section h2 {
+        margin-bottom: 20px;
+        color: var(--teal);
+        font-size: 1.3rem;
+    }
+
+    .qualifications ul,
+    .awards ul,
+    .memberships ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .qualifications li,
+    .awards li,
+    .memberships li {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .qualifications i,
+    .awards i,
+    .memberships i {
+        color: var(--teal);
+        font-size: 1rem;
+        width: 20px;
+    }
+
+    /* Rating Summary */
+    .rating-summary {
+        background: var(--gray-light);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .avg-rating .rating-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--teal);
+    }
+
+    .avg-rating .stars {
+        display: inline-block;
+        margin: 0 10px;
+    }
+
+    .rating-count {
+        color: var(--gray);
+    }
+
+    /* Review Cards */
+    .review-card {
+        background: var(--gray-light);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+    }
+
+    .feedback-card {
+        background: var(--white);
+        border-left: 4px solid var(--teal);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .stars {
+        color: #ffc107;
+    }
+
+    .feedback-meta {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+        color: var(--gray);
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-response {
+        background: var(--teal-bg);
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+
+    .admin-response i {
+        color: var(--teal);
+    }
+
+    .give-feedback-btn {
+        margin-top: 25px;
+        text-align: center;
+    }
+
+    .schedule-card,
+    .book-card {
+        background: var(--gray-light);
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+    .schedule-card h3,
+    .book-card h3 {
+        margin-bottom: 20px;
+        color: var(--teal);
+    }
+
+    .schedule-list {
+        margin-bottom: 15px;
+    }
+
+    .schedule-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+
+    .schedule-item:last-child {
+        border-bottom: none;
+    }
+
+    .day {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .time {
+        color: var(--teal);
+        font-weight: 500;
+    }
+
+    .availability-note {
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px solid var(--gray-medium);
+        font-size: 0.8rem;
+        color: var(--gray);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .availability-note i {
+        color: var(--teal);
+    }
+
+    .no-schedule {
+        text-align: center;
+        padding: 15px;
+        color: var(--gray);
+    }
+
+    @media (max-width: 768px) {
+        .doctor-profile {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .doctor-avatar {
+            margin: 0 auto;
+        }
+
+        .doctor-badges {
+            justify-content: center;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .doctor-info h1 {
+            font-size: 1.5rem;
+        }
+        
+        .feedback-meta {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .review-header {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+
+/* ============================================
+   SIMILAR DOCTORS SECTION
+   ============================================ */
+.similar-doctors-section {
+    padding: 70px 0;
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+    margin-top: 40px;
+}
+
+.similar-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.ai-badge-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #26a69a, #1e847a);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(38, 166, 154, 0.25);
+}
+
+.ai-badge-small i {
+    font-size: 0.8rem;
+}
+
+.similar-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 10px;
+}
+
+.similar-header p {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.similar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.similar-card {
+    background: white;
+    padding: 35px 25px 25px;
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f5;
+}
+
+.similar-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(38, 166, 154, 0.15);
+    border-color: #26a69a;
+}
+
+.similar-match {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #26a69a, #1e847a);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 3px 10px rgba(38, 166, 154, 0.3);
+}
+
+.similar-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #26a69a, #1e847a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(38, 166, 154, 0.25);
+    border: 3px solid white;
+}
+
+.similar-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.similar-image i {
+    font-size: 3rem;
+    color: white;
+}
+
+.similar-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 5px;
+}
+
+.similar-specialty {
+    color: #26a69a;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.similar-stats {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.similar-stats span {
+    font-size: 0.8rem;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.similar-stats i {
+    color: #26a69a;
+    font-size: 0.75rem;
+}
+
+.similar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: #26a69a;
+    padding: 10px 22px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    border: 2px solid #26a69a;
+}
+
+.similar-btn:hover {
+    background: #26a69a;
+    color: white;
+    gap: 10px;
+}
+
+@media (max-width: 992px) {
+    .similar-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .similar-header h2 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .similar-grid {
+        grid-template-columns: 1fr;
+    }
+    .similar-doctors-section {
+        padding: 50px 0;
+    }
+}
+</style>
+{% endblock %}

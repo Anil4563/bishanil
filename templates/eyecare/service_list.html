@@ -1,0 +1,113 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Eye Care Services - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our <span>Eye Care Services</span></h1>
+        <p>Comprehensive eye care for clear vision and healthy eyes</p>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="eye-services">
+    <div class="container">
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="{{ service.icon_class }}"></i>
+                </div>
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.short_description }}</p>
+                <a href="{% url 'eyecare:service_detail' service.slug %}" class="service-link">Learn More →</a>
+            </div>
+            {% empty %}
+            <p>No services available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Eye Care -->
+<section class="why-eyecare">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Our <span>Eye Care?</span></h2>
+            <p>Advanced eye care with modern technology and expert specialists</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <h3>Advanced Technology</h3>
+                <p>Latest diagnostic and surgical equipment</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Expert Specialists</h3>
+                <p>Experienced ophthalmologists and optometrists</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-glasses"></i>
+                </div>
+                <h3>Premium Optical Store</h3>
+                <p>Wide range of frames and lenses</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Flexible Timings</h3>
+                <p>Convenient appointment scheduling</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="appointment-cta">
+    <div class="container">
+        <h2>Protect Your Vision Today</h2>
+        <p>Book your eye checkup appointment with our expert ophthalmologists</p>
+        {% if user.is_authenticated %}
+            <a href="/appointments/book/" class="btn-primary">Book Eye Checkup</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn-primary">Book Eye Checkup</a>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .eye-services {
+        padding: 60px 0;
+    }
+    
+    .why-eyecare {
+        background: var(--gray-light);
+        padding: 60px 0;
+    }
+</style>
+{% endblock %}

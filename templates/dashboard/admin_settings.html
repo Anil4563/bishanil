@@ -1,0 +1,98 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+
+<!-- Contact Settings -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px;">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; color: #212529;">
+        <i class="fas fa-building" style="color: #26a69a;"></i> Contact Settings
+    </h3>
+
+    {% if contact %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; width: 220px; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Phone Primary</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.phone_primary|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Phone Secondary</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.phone_secondary|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Email Primary</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.email_primary|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Email Support</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.email_support|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Address</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.address|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Facebook</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.facebook_url|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th style="padding: 14px 12px; text-align: left; color: #6c757d; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8f9fa;">Instagram</th>
+                <td style="padding: 14px 12px; border-bottom: 1px solid #f8f9fa;">{{ contact.instagram_url|default:"-" }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="margin-top: 20px; color: #6c757d; font-size: 0.9rem;">
+        <i class="fas fa-info-circle"></i> To edit these settings, go to: 
+        <a href="/admin/contact/contactsettings/" style="color: #26a69a; font-weight: 600;">Contact Settings (Django Admin)</a>
+    </p>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No contact settings found</p>
+    {% endif %}
+</div>
+
+<!-- About Us -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px;">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; color: #212529;">
+        <i class="fas fa-info-circle" style="color: #26a69a;"></i> About Us
+    </h3>
+
+    {% if about %}
+    <p style="margin-bottom: 10px;"><strong>Title:</strong> {{ about.title }}</p>
+    <p style="margin-bottom: 10px;"><strong>Subtitle:</strong> {{ about.subtitle|default:"-" }}</p>
+    <p style="margin-bottom: 15px;"><strong>Description:</strong></p>
+    <p style="color: #6c757d; line-height: 1.7; margin-bottom: 15px;">{{ about.description|truncatechars:300 }}</p>
+    <p style="color: #6c757d; font-size: 0.9rem;">
+        <i class="fas fa-info-circle"></i> To edit: 
+        <a href="/admin/homepage/aboutus/" style="color: #26a69a; font-weight: 600;">Edit About Us</a>
+    </p>
+    {% else %}
+    <p style="text-align: center; padding: 40px; color: #6c757d;">No About Us content yet</p>
+    {% endif %}
+</div>
+
+<!-- System Info -->
+<div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; color: #212529;">
+        <i class="fas fa-cog" style="color: #26a69a;"></i> Quick Links
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+        <a href="/admin/" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529; transition: all 0.3s;">
+            <i class="fas fa-cog" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.8rem; font-weight: 600;">Django Admin</span>
+        </a>
+        <a href="/" target="_blank" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-globe" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.8rem; font-weight: 600;">View Website</span>
+        </a>
+        <a href="{% url 'dashboard:admin_dashboard' %}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 10px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #212529;">
+            <i class="fas fa-tachometer-alt" style="font-size: 1.6rem; color: #26a69a;"></i>
+            <span style="font-size: 0.8rem; font-weight: 600;">Dashboard</span>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

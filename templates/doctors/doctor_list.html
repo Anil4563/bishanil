@@ -1,0 +1,227 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Our Doctors - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our <span>Expert Doctors</span></h1>
+        <p>Meet our team of experienced dental and eye care specialists</p>
+    </div>
+</section>
+
+<!-- Featured Doctors -->
+{% if featured_doctors %}
+<section class="featured-doctors">
+    <div class="container">
+        <div class="section-header">
+            <h2>Featured <span>Specialists</span></h2>
+        </div>
+        <div class="doctors-grid">
+            {% for doctor in featured_doctors %}
+            <div class="doctor-card">
+                <div class="doctor-image">
+                    {% if doctor.profile_image %}
+                    <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                    {% else %}
+                    <i class="{{ doctor.icon_class }}"></i>
+                    {% endif %}
+                </div>
+                <h3>Dr. {{ doctor.name }}</h3>
+                <p class="doctor-specialty">{{ doctor.specialization }}</p>
+                <p class="doctor-experience"><i class="fas fa-briefcase"></i> {{ doctor.experience_years }} years experience</p>
+                <div class="doctor-meta">
+                    <span><i class="fas fa-graduation-cap"></i> {{ doctor.get_degree_display }}</span>
+                    <span><i class="fas fa-comment-dollar"></i> ₹{{ doctor.consultation_fee }}</span>
+                </div>
+                <a href="{% url 'doctors:doctor_detail' doctor.slug %}" class="btn-outline">View Profile</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Dental Doctors -->
+<section class="dental-doctors">
+    <div class="container">
+        <div class="section-header">
+            <h2>Dental <span>Specialists</span></h2>
+            <p>Expert dentists for all your dental needs</p>
+        </div>
+        <div class="doctors-grid">
+            {% for doctor in dental_doctors %}
+            <div class="doctor-card">
+                <div class="doctor-image">
+                    {% if doctor.profile_image %}
+                    <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                    {% else %}
+                    <i class="{{ doctor.icon_class }}"></i>
+                    {% endif %}
+                </div>
+                <h3>Dr. {{ doctor.name }}</h3>
+                <p class="doctor-specialty">{{ doctor.specialization }}</p>
+                <p class="doctor-experience"><i class="fas fa-briefcase"></i> {{ doctor.experience_years }} years</p>
+                <div class="doctor-meta">
+                    <span><i class="fas fa-graduation-cap"></i> {{ doctor.get_degree_display }}</span>
+                    <span><i class="fas fa-comment-dollar"></i> ₹{{ doctor.consultation_fee }}</span>
+                </div>
+                <a href="{% url 'doctors:doctor_detail' doctor.slug %}" class="btn-outline">View Profile</a>
+            </div>
+            {% empty %}
+            <p>No dental doctors available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Eye Doctors -->
+<section class="eye-doctors">
+    <div class="container">
+        <div class="section-header">
+            <h2>Eye Care <span>Specialists</span></h2>
+            <p>Expert ophthalmologists for clear vision</p>
+        </div>
+        <div class="doctors-grid">
+            {% for doctor in eye_doctors %}
+            <div class="doctor-card">
+                <div class="doctor-image">
+                    {% if doctor.profile_image %}
+                    <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.name }}">
+                    {% else %}
+                    <i class="{{ doctor.icon_class }}"></i>
+                    {% endif %}
+                </div>
+                <h3>Dr. {{ doctor.name }}</h3>
+                <p class="doctor-specialty">{{ doctor.specialization }}</p>
+                <p class="doctor-experience"><i class="fas fa-briefcase"></i> {{ doctor.experience_years }} years</p>
+                <div class="doctor-meta">
+                    <span><i class="fas fa-graduation-cap"></i> {{ doctor.get_degree_display }}</span>
+                    <span><i class="fas fa-comment-dollar"></i> ₹{{ doctor.consultation_fee }}</span>
+                </div>
+                <a href="{% url 'doctors:doctor_detail' doctor.slug %}" class="btn-outline">View Profile</a>
+            </div>
+            {% empty %}
+            <p>No eye doctors available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .page-header h1 span {
+        color: var(--teal);
+    }
+    
+    .featured-doctors, .dental-doctors, .eye-doctors {
+        padding: 60px 0;
+    }
+    
+    .featured-doctors {
+        background: var(--gray-light);
+    }
+    
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    
+    .doctor-card {
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        text-align: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        padding: 30px 20px;
+    }
+    
+    .doctor-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .doctor-image {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 20px;
+        background: var(--teal-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .doctor-image i {
+        font-size: 5rem;
+        color: var(--teal);
+    }
+    
+    .doctor-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .doctor-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 5px;
+    }
+    
+    .doctor-specialty {
+        color: var(--teal);
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .doctor-experience {
+        color: var(--gray);
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+    
+    .doctor-meta {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .doctor-meta span {
+        background: var(--gray-light);
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    
+    .doctor-meta i {
+        margin-right: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .doctors-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Bishanil Dental{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ title }}</h1>
+    </div>
+</section>
+
+<section class="blog-section">
+    <div class="container">
+        <div class="blog-grid">
+            {% for post in page_obj %}
+            <div class="blog-card">
+                {% if post.featured_image %}
+                <div class="blog-image">
+                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                    <span class="post-type">{{ post.get_post_type_display }}</span>
+                </div>
+                {% endif %}
+                <div class="blog-content">
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <div class="post-meta">
+                        <span><i class="fas fa-calendar"></i> {{ post.published_at|date:"M d, Y" }}</span>
+                        <span><i class="fas fa-clock"></i> {{ post.reading_time }} min read</span>
+                    </div>
+                    <p>{{ post.excerpt|truncatechars:100 }}</p>
+                    <a href="{{ post.get_absolute_url }}" class="read-more">Read More →</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>No posts found.</p>
+            {% endfor %}
+        </div>
+        
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link">← Previous</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="page-link active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--gray-light) 0%, var(--white) 100%);
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .blog-section {
+        padding: 60px 0;
+    }
+    
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+    }
+    
+    .blog-card {
+        background: var(--white);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .blog-image {
+        position: relative;
+        height: 200px;
+    }
+    
+    .blog-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .post-type {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--teal);
+        color: var(--white);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .blog-content {
+        padding: 20px;
+    }
+    
+    .blog-content h3 a {
+        text-decoration: none;
+        color: var(--dark);
+    }
+    
+    .blog-content h3 a:hover {
+        color: var(--teal);
+    }
+    
+    .post-meta {
+        display: flex;
+        gap: 15px;
+        margin: 12px 0;
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 50px;
+    }
+    
+    .page-link {
+        padding: 8px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--dark);
+    }
+    
+    .page-link:hover, .page-link.active {
+        background: var(--teal);
+        color: var(--white);
+    }
+    
+    @media (max-width: 768px) {
+        .blog-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

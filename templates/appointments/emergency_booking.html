@@ -1,0 +1,371 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Emergency Booking - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Emergency <span>Booking</span></h1>
+        <p>24/7 emergency dental and eye care services</p>
+    </div>
+</section>
+
+<section class="emergency-section">
+    <div class="container">
+        <div class="emergency-grid">
+            <div class="emergency-info">
+                <div class="emergency-badge">
+                    <i class="fas fa-ambulance"></i>
+                    <span>24/7 Emergency Service</span>
+                </div>
+                <h2>Need Immediate Care?</h2>
+                <p>We provide emergency dental and eye care services 24 hours a day, 7 days a week. Our emergency team is always ready to help you.</p>
+                
+                <div class="emergency-contacts">
+                    <div class="contact-card">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h4>Call Us Now</h4>
+                            <p><a href="tel:+9779800000000">+977 9800000000</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fab fa-whatsapp"></i>
+                        <div>
+                            <h4>WhatsApp</h4>
+                            <p><a href="https://wa.me/9779800000000">+977 9800000000</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="emergency-tips">
+                    <h3>What to do in Emergency?</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Stay calm and assess the situation</li>
+                        <li><i class="fas fa-check-circle"></i> For dental emergencies, rinse mouth with warm water</li>
+                        <li><i class="fas fa-check-circle"></i> For eye emergencies, avoid rubbing the eye</li>
+                        <li><i class="fas fa-check-circle"></i> Call us immediately for guidance</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="emergency-form">
+                <h3>Request Emergency Call Back</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <div class="form-field">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" name="patient_name" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" name="patient_phone" placeholder="98XXXXXXXX" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label>Age <span class="required">*</span></label>
+                            <input type="number" name="patient_age" placeholder="Your age" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label>Emergency Type <span class="required">*</span></label>
+                            <select name="emergency_type" required>
+                                <option value="">Select emergency type</option>
+                                <option value="dental">🦷 Dental Emergency</option>
+                                <option value="eye">👁️ Eye Emergency</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label>Describe your emergency <span class="required">*</span></label>
+                            <textarea name="symptoms" rows="4" placeholder="Please describe your emergency situation in detail..." required></textarea>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label>Preferred Time (Optional)</label>
+                            <input type="datetime-local" name="preferred_time">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-emergency-submit">
+                        <i class="fas fa-paper-plane"></i> Submit Emergency Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        padding: 60px 0;
+        text-align: center;
+        color: var(--white);
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .page-header h1 span {
+        color: var(--white);
+    }
+    
+    .page-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .emergency-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
+    
+    .emergency-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+    
+    /* Left Side - Information */
+    .emergency-info {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .emergency-badge {
+        background: rgba(255, 107, 107, 0.15);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        border-radius: 50px;
+        margin-bottom: 20px;
+    }
+    
+    .emergency-badge i {
+        color: #ff6b6b;
+        font-size: 1.1rem;
+    }
+    
+    .emergency-badge span {
+        color: #ff6b6b;
+        font-weight: 600;
+    }
+    
+    .emergency-info h2 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: var(--dark);
+    }
+    
+    .emergency-info p {
+        color: var(--gray);
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .emergency-contacts {
+        margin: 30px 0;
+    }
+    
+    .contact-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--gray-light);
+        padding: 15px 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .contact-card:hover {
+        transform: translateX(5px);
+        background: var(--teal-bg);
+    }
+    
+    .contact-card i {
+        font-size: 1.8rem;
+        color: var(--teal);
+    }
+    
+    .contact-card h4 {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        color: var(--gray);
+    }
+    
+    .contact-card a {
+        color: var(--teal);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .emergency-tips {
+        background: var(--gray-light);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+    }
+    
+    .emergency-tips h3 {
+        margin-bottom: 15px;
+        color: var(--teal);
+        font-size: 1.1rem;
+    }
+    
+    .emergency-tips ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .emergency-tips li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: var(--gray-dark);
+    }
+    
+    .emergency-tips li i {
+        color: var(--teal);
+        font-size: 1rem;
+    }
+    
+    /* Right Side - Form */
+    .emergency-form {
+        background: var(--white);
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .emergency-form h3 {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        color: var(--teal);
+        text-align: center;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-field label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+        font-size: 0.9rem;
+    }
+    
+    .required {
+        color: #ff6b6b;
+    }
+    
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 12px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+    }
+    
+    .form-field input::placeholder,
+    .form-field textarea::placeholder {
+        color: #adb5bd;
+    }
+    
+    .btn-emergency-submit {
+        width: 100%;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-emergency-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .emergency-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 40px 0;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .emergency-info,
+        .emergency-form {
+            padding: 25px;
+        }
+        
+        .emergency-info h2 {
+            font-size: 1.4rem;
+        }
+        
+        .contact-card {
+            padding: 12px 15px;
+        }
+        
+        .contact-card i {
+            font-size: 1.5rem;
+        }
+        
+        .btn-emergency-submit {
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}

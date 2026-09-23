@@ -1,0 +1,515 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}My Appointments - Bishanil Dental & Eye Care{% endblock %}
+
+{% block content %}
+<section class="appointments-section">
+    <div class="container">
+        <div class="page-header">
+            <h1>My Appointments</h1>
+            <p>View and manage all your appointments</p>
+        </div>
+        
+        <!-- Tabs for Regular and Follow-up Appointments -->
+        <div class="appointments-tabs">
+            <button class="tab-btn active" onclick="showAppointmentTab('regular')">Regular Appointments</button>
+            <button class="tab-btn" onclick="showAppointmentTab('followup')">Follow-up Appointments</button>
+        </div>
+        
+        <!-- Regular Appointments Tab -->
+        <div id="regular-appointments" class="appointment-tab active">
+            <div class="appointments-container">
+                {% if appointments %}
+                <div class="appointments-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Service</th>
+                                <th>Doctor</th>
+                                <th>Attendance</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>
+                                    <span class="status-badge {{ appointment.status }}">
+                                        {{ appointment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ appointment.appointment_date }}</td>
+                                <td>{{ appointment.appointment_time|time:"g:i A" }}</td>
+                                <td>{{ appointment.service_name }}</td>
+                                <td>{% if appointment.doctor %}Dr. {{ appointment.doctor.name }}{% else %}-{% endif %}</td>
+                                <td>
+                                    {% if appointment.attendance_status == 'came' %}
+                                        <span class="attendance-badge came">✓ Came</span>
+                                    {% elif appointment.attendance_status == 'not_came' %}
+                                        <span class="attendance-badge not-came">✗ Did not come</span>
+                                    {% elif appointment.attendance_status == 'rescheduled' %}
+                                        <span class="attendance-badge rescheduled">⟳ Rescheduled</span>
+                                    {% else %}
+                                        <span class="attendance-badge pending">⏳ Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
+                                    <button class="btn-cancel" onclick="openRescheduleModal({{ appointment.id }})">Reschedule</button>
+                                    <button class="btn-cancel" onclick="openCancelModal({{ appointment.id }})">Cancel</button>
+                                    {% else %}
+                                    <span class="no-action">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-appointments">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No Regular Appointments Found</h3>
+                    <p>You haven't booked any appointments yet.</p>
+                    <a href="{% url 'appointments:book_appointment' %}" class="btn-primary">Book Appointment</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Follow-up Appointments Tab -->
+        <div id="followup-appointments" class="appointment-tab">
+            <div class="appointments-container">
+                {% if followup_appointments %}
+                <div class="appointments-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Service</th>
+                                <th>Doctor</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in followup_appointments %}
+                            <tr class="followup-row">
+                                <td>
+                                    <span class="status-badge {{ appointment.status }}">
+                                        {{ appointment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ appointment.appointment_date }}</td>
+                                <td>{{ appointment.appointment_time|time:"g:i A" }}</td>
+                                <td>{{ appointment.service_name }}</td>
+                                <td>{% if appointment.doctor %}Dr. {{ appointment.doctor.name }}{% else %}-{% endif %}</td>
+                                <td>
+                                    <span class="followup-badge">Follow-up Visit</span>
+                                </td>
+                                <td>
+                                    {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
+                                    <button class="btn-cancel" onclick="openCancelModal({{ appointment.id }})">Cancel</button>
+                                    {% else %}
+                                    <span class="no-action">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-appointments">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h3>No Follow-up Appointments</h3>
+                    <p>You don't have any scheduled follow-up appointments.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cancel Modal -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Cancel Appointment</h3>
+        <p>Are you sure you want to cancel this appointment?</p>
+        <form id="cancelForm" method="POST">
+            {% csrf_token %}
+            <div class="modal-buttons">
+                <button type="submit" class="btn-cancel-confirm">Yes, Cancel</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">No, Go Back</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reschedule Modal -->
+<div id="rescheduleModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRescheduleModal()">&times;</span>
+        <h3>Reschedule Appointment</h3>
+        <p>Request to change your appointment date/time</p>
+        <form id="rescheduleForm" method="POST">
+            {% csrf_token %}
+            <div class="form-field">
+                <label>New Date</label>
+                <input type="date" name="new_date" id="new_date" required>
+            </div>
+            <div class="form-field">
+                <label>New Time</label>
+                <select name="new_time" id="new_time" required>
+                    <option value="">Select time</option>
+                    <option value="09:00">09:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="15:00">03:00 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Reason for rescheduling</label>
+                <textarea name="reason" rows="3" placeholder="Please tell us why you want to reschedule..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="btn-primary">Submit Request</button>
+                <button type="button" class="btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .appointments-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+        min-height: 80vh;
+    }
+    
+    .page-header {
+        margin-bottom: 40px;
+    }
+    
+    .page-header h1 {
+        color: var(--teal);
+        margin-bottom: 10px;
+    }
+    
+    /* Tabs Styles */
+    .appointments-tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        justify-content: center;
+    }
+    
+    .tab-btn {
+        padding: 10px 25px;
+        background: var(--white);
+        border: 2px solid var(--teal);
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        color: var(--teal);
+    }
+    
+    .tab-btn.active {
+        background: var(--teal);
+        color: white;
+    }
+    
+    .tab-btn:hover {
+        background: var(--teal);
+        color: white;
+    }
+    
+    .appointment-tab {
+        display: none;
+    }
+    
+    .appointment-tab.active {
+        display: block;
+    }
+    
+    .appointments-table {
+        background: var(--white);
+        border-radius: 20px;
+        overflow-x: auto;
+        padding: 20px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-medium);
+    }
+    
+    th {
+        background: var(--gray-light);
+        font-weight: 600;
+    }
+    
+    .followup-row {
+        background: #fff8e1;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge.confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.completed {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-badge.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .attendance-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .attendance-badge.came {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .attendance-badge.not-came {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .attendance-badge.rescheduled {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .attendance-badge.pending {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+    
+    .followup-badge {
+        background: #ff9800;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .btn-cancel {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        margin: 2px;
+    }
+    
+    .btn-cancel:hover {
+        background: #c82333;
+    }
+    
+    .no-appointments {
+        text-align: center;
+        padding: 60px;
+        background: var(--white);
+        border-radius: 20px;
+    }
+    
+    .no-appointments i {
+        font-size: 4rem;
+        color: var(--gray);
+        margin-bottom: 20px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+    }
+    
+    .modal-content {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+    }
+    
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 25px;
+    }
+    
+    .btn-cancel-confirm {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    
+    .form-field label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    
+    .form-field input, .form-field select, .form-field textarea {
+        padding: 10px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        th, td {
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-cancel {
+            padding: 3px 8px;
+            font-size: 0.7rem;
+        }
+        
+        .appointments-tabs {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tab-btn {
+            width: 200px;
+        }
+    }
+</style>
+
+<script>
+    let currentAppointmentId = null;
+    
+    function showAppointmentTab(tabName) {
+        // Hide all tabs
+        document.getElementById('regular-appointments').classList.remove('active');
+        document.getElementById('followup-appointments').classList.remove('active');
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        if (tabName === 'regular') {
+            document.getElementById('regular-appointments').classList.add('active');
+            document.querySelector('.tab-btn:first-child').classList.add('active');
+        } else {
+            document.getElementById('followup-appointments').classList.add('active');
+            document.querySelector('.tab-btn:last-child').classList.add('active');
+        }
+    }
+    
+    function openCancelModal(appointmentId) {
+        currentAppointmentId = appointmentId;
+        const modal = document.getElementById('cancelModal');
+        const form = document.getElementById('cancelForm');
+        form.action = `/accounts/appointment/${appointmentId}/cancel/`;
+        modal.style.display = 'block';
+    }
+    
+    function openRescheduleModal(appointmentId) {
+        currentAppointmentId = appointmentId;
+        const modal = document.getElementById('rescheduleModal');
+        const form = document.getElementById('rescheduleForm');
+        form.action = `/accounts/appointment/${appointmentId}/reschedule/`;
+        modal.style.display = 'block';
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('cancelModal');
+        modal.style.display = 'none';
+    }
+    
+    function closeRescheduleModal() {
+        const modal = document.getElementById('rescheduleModal');
+        modal.style.display = 'none';
+    }
+    
+    document.querySelectorAll('.close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            closeModal();
+            closeRescheduleModal();
+        });
+    });
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('cancelModal')) {
+            closeModal();
+        }
+        if (e.target === document.getElementById('rescheduleModal')) {
+            closeRescheduleModal();
+        }
+    });
+</script>
+{% endblock %}
