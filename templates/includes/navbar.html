@@ -53,7 +53,7 @@
     <div class="container">
         <div class="navbar-wrapper">
             <a href="/" class="logo">
-                <img src="{% static 'images/logo11.jpg' %}" alt="Logo" class="logo-img">
+                <img src="{% static 'images/logo111.jpg' %}" alt="Logo" class="logo-img">
                 <div class="logo-text">
                     <span>Bishanil <span class="accent">Dental</span></span>
                     <small>& Eye Care</small>
@@ -82,47 +82,65 @@
 
                 <!-- Account Dropdown -->
                 {% if user.is_authenticated %}
-                    {% if user.doctor_profile and user.doctor_profile.is_approved %}
-                    <!-- Doctor Logged In -->
-                    <li class="dropdown">
-                        <a href="#" class="user-menu-btn">
-                            <i class="fas fa-user-md"></i> {{ user.doctor_profile.name }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{% url 'doctors:doctor_dashboard' %}"><i class="fas fa-chart-line"></i> Doctor Dashboard</a></li>
-                            <li><a href="{% url 'doctors:doctor_dashboard' %}#appointments"><i class="fas fa-calendar-alt"></i> My Appointments</a></li>
-                            <li><a href="{% url 'doctors:doctor_dashboard' %}#patients"><i class="fas fa-users"></i> My Patients</a></li>
-                            <li><a href="{% url 'doctors:doctor_dashboard' %}#prescriptions"><i class="fas fa-prescription-bottle"></i> Prescriptions</a></li>
-                            <li><a href="{% url 'doctors:doctor_dashboard' %}#profile"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <!-- Patient Logged In (Also shows for Admin) -->
-                    <li class="dropdown">
-                        <a href="#" class="user-menu-btn">
-                            <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if user.is_staff %}
-                            <li><a href="{% url 'dashboard:admin_dashboard' %}"><i class="fas fa-chart-pie"></i> Admin Dashboard</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-                            <li><a href="{% url 'accounts:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Patient Dashboard</a></li>
-                            <li><a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
-                            <li><a href="{% url 'accounts:my_appointments' %}"><i class="fas fa-calendar-alt"></i> My Appointments</a></li>
-                            <li><a href="{% url 'accounts:dashboard' %}#medical"><i class="fas fa-notes-medical"></i> Medical History</a></li>
-                            <li><a href="{% url 'accounts:dashboard' %}#bills"><i class="fas fa-file-invoice"></i> My Bills</a></li>
-                            {% if user.is_staff %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a href="/admin/" target="_blank"><i class="fas fa-cog"></i> Django Admin</a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
+                {% if user.doctor_profile and user.doctor_profile.is_approved %}
+                <!-- Doctor Logged In -->
+                <li class="dropdown">
+                    <a href="#" class="user-menu-btn">
+                        <i class="fas fa-user-md"></i> {{ user.doctor_profile.name }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'doctors:doctor_dashboard' %}"><i class="fas fa-chart-line"></i> Doctor
+                                Dashboard</a></li>
+                        <li><a href="{% url 'doctors:doctor_dashboard' %}#appointments"><i
+                                    class="fas fa-calendar-alt"></i> My Appointments</a></li>
+                        <li><a href="{% url 'doctors:doctor_dashboard' %}#patients"><i class="fas fa-users"></i> My
+                                Patients</a></li>
+                        <li><a href="{% url 'doctors:doctor_dashboard' %}#prescriptions"><i
+                                    class="fas fa-prescription-bottle"></i> Prescriptions</a></li>
+                        <li><a href="{% url 'doctors:doctor_dashboard' %}#profile"><i class="fas fa-user-edit"></i> Edit
+                                Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <!-- Patient Logged In (Also shows for Admin) -->
+                <li class="dropdown">
+                    <a href="#" class="user-menu-btn">
+                        <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if user.is_staff %}
+                        <li><a href="{% url 'dashboard:admin_dashboard' %}"><i class="fas fa-chart-pie"></i> Admin
+                                Dashboard</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        {% endif %}
+                        <li><a href="{% url 'accounts:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Patient
+                                Dashboard</a></li>
+                        <li><a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                        <li><a href="{% url 'accounts:my_appointments' %}"><i class="fas fa-calendar-alt"></i> My
+                                Appointments</a></li>
+                        <li><a href="{% url 'accounts:dashboard' %}#medical"><i class="fas fa-notes-medical"></i>
+                                Medical History</a></li>
+                        <li><a href="{% url 'accounts:dashboard' %}#bills"><i class="fas fa-file-invoice"></i> My
+                                Bills</a></li>
+                        {% if user.is_staff %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a href="/admin/" target="_blank"><i class="fas fa-cog"></i> Django Admin</a></li>
+                        {% endif %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </li>
+                {% endif %}
                 {% else %}
                 <!-- Not Logged In -->
                 <li class="auth-dropdown">
@@ -130,11 +148,17 @@
                         <i class="fas fa-user"></i> Account
                     </a>
                     <ul class="auth-dropdown-menu">
-                        <li><a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt"></i> Patient Login</a></li>
-                        <li><a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus"></i> Patient Register</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a href="{% url 'doctors:doctor_login' %}"><i class="fas fa-user-md"></i> Doctor Login</a></li>
-                        <li><a href="{% url 'doctors:doctor_register' %}"><i class="fas fa-stethoscope"></i> Become a Doctor</a></li>
+                        <li><a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt"></i> Patient Login</a>
+                        </li>
+                        <li><a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus"></i> Patient
+                                Register</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a href="{% url 'doctors:doctor_login' %}"><i class="fas fa-user-md"></i> Doctor Login</a>
+                        </li>
+                        <li><a href="{% url 'doctors:doctor_register' %}"><i class="fas fa-stethoscope"></i> Become a
+                                Doctor</a></li>
                     </ul>
                 </li>
                 {% endif %}

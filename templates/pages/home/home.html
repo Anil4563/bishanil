@@ -171,7 +171,7 @@
                 <img src="{{ about_us.image.url }}" alt="{{ about_us.title }}" class="about-img">
                 {% else %}
                 <div class="about-image-placeholder">
-                    <img src="{% static 'images/about.png' %}" alt="About Us"
+                    <img src="{% static 'images/about1.jpg' %}" alt="About Us"
                         onerror="this.src='https://placehold.co/600x500/26a69a/white?text=About+Us'">
                 </div>
                 {% endif %}
@@ -221,7 +221,7 @@
                 <div class="rank-badge rank-{{ forloop.counter }}">
                     {% if forloop.counter == 1 %}🏆 #1{% elif forloop.counter == 2 %}🥈 #2{% else %}🥉 #3{% endif %}
                 </div>
-                
+
                 <!-- Doctor Image -->
                 <div class="top-doctor-image">
                     {% if item.doctor.profile_image %}
@@ -230,11 +230,11 @@
                     <i class="fas fa-user-md"></i>
                     {% endif %}
                 </div>
-                
+
                 <!-- Doctor Info -->
                 <h3>Dr. {{ item.doctor.name }}</h3>
                 <p class="specialty">{{ item.doctor.specialization }}</p>
-                
+
                 <!-- Stats -->
                 <div class="doctor-stats">
                     <div class="stat-item">
@@ -250,7 +250,7 @@
                         <span>{{ item.total_appointments }} visits</span>
                     </div>
                 </div>
-                
+
                 <!-- AI Score -->
                 <div class="ai-score">
                     <div class="score-label">
@@ -259,7 +259,7 @@
                     </div>
                     <div class="score-value">{{ item.score }}</div>
                 </div>
-                
+
                 <!-- Action -->
                 <a href="{% url 'doctors:doctor_detail' item.doctor.slug %}" class="view-doctor-btn">
                     View Profile <i class="fas fa-arrow-right"></i>
@@ -506,12 +506,12 @@
             <h2>What Our <span>Patients Say</span></h2>
             <p>Real feedback from real patients</p>
         </div>
-        
+
         <div class="feedback-tabs">
             <button class="tab-btn active" onclick="showTab('clinic')">Clinic Feedback</button>
             <button class="tab-btn" onclick="showTab('doctor')">Doctor Feedback</button>
         </div>
-        
+
         <!-- Clinic Feedback Tab -->
         <div id="clinic-feedback" class="feedback-tab active">
             <div class="feedback-grid">
@@ -519,12 +519,11 @@
                 <div class="feedback-card">
                     <div class="feedback-rating">
                         {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= feedback.rating %}
-                            <i class="fas fa-star"></i>
+                        {% if forloop.counter <= feedback.rating %} <i class="fas fa-star"></i>
                             {% else %}
                             <i class="far fa-star"></i>
                             {% endif %}
-                        {% endfor %}
+                            {% endfor %}
                     </div>
                     <p class="feedback-text">"{{ feedback.feedback_text|truncatechars:150 }}"</p>
                     <div class="feedback-author">
@@ -550,7 +549,7 @@
                 {% endfor %}
             </div>
         </div>
-        
+
         <!-- Doctor Feedback Tab -->
         <div id="doctor-feedback" class="feedback-tab">
             <div class="feedback-grid">
@@ -558,12 +557,11 @@
                 <div class="feedback-card">
                     <div class="feedback-rating">
                         {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= feedback.rating %}
-                            <i class="fas fa-star"></i>
+                        {% if forloop.counter <= feedback.rating %} <i class="fas fa-star"></i>
                             {% else %}
                             <i class="far fa-star"></i>
                             {% endif %}
-                        {% endfor %}
+                            {% endfor %}
                     </div>
                     <p class="feedback-text">"{{ feedback.feedback_text|truncatechars:150 }}"</p>
                     <div class="feedback-author">
@@ -590,7 +588,7 @@
                 {% endfor %}
             </div>
         </div>
-        
+
         <div class="feedback-cta">
             <p>Share your experience with us!</p>
             <a href="{% url 'feedback:feedback_page' %}" class="btn-primary">Give Feedback</a>
@@ -599,176 +597,183 @@
 </section>
 
 <style>
-/* Feedback Section Styles */
-.feedback-section {
-    padding: 60px 0;
-    background: var(--gray-light);
-}
+    /* Feedback Section Styles */
+    .feedback-section {
+        padding: 60px 0;
+        background: var(--gray-light);
+    }
 
-.feedback-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.tab-btn {
-    padding: 12px 30px;
-    background: var(--white);
-    border: 2px solid var(--teal);
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    color: var(--teal);
-}
-
-.tab-btn.active {
-    background: var(--teal);
-    color: var(--white);
-}
-
-.tab-btn:hover {
-    background: var(--teal);
-    color: var(--white);
-}
-
-.feedback-tab {
-    display: none;
-}
-
-.feedback-tab.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.feedback-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-}
-
-.feedback-card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.feedback-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
-}
-
-.feedback-rating {
-    color: #ffc107;
-    margin-bottom: 15px;
-}
-
-.feedback-text {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--gray-dark);
-    margin-bottom: 20px;
-    font-style: italic;
-}
-
-.feedback-author {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.author-initial {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #26a69a, #1e847a);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.author-details h4 {
-    font-size: 1rem;
-    margin-bottom: 3px;
-}
-
-.author-details small {
-    font-size: 0.7rem;
-    color: var(--gray);
-    display: block;
-}
-
-.author-details .treatment {
-    color: var(--teal);
-    margin-top: 3px;
-}
-
-.admin-response {
-    background: var(--teal-bg);
-    padding: 12px;
-    border-radius: 10px;
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    font-size: 0.85rem;
-}
-
-.admin-response i {
-    color: var(--teal);
-    margin-top: 2px;
-}
-
-.admin-response p {
-    margin: 0;
-    color: var(--gray-dark);
-}
-
-.no-feedback {
-    text-align: center;
-    padding: 40px;
-    background: var(--white);
-    border-radius: 20px;
-    color: var(--gray);
-}
-
-.feedback-cta {
-    text-align: center;
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px solid var(--gray-medium);
-}
-
-.feedback-cta p {
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
     .feedback-tabs {
-        flex-direction: column;
-        align-items: center;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 40px;
     }
-    
+
     .tab-btn {
-        width: 200px;
+        padding: 12px 30px;
+        background: var(--white);
+        border: 2px solid var(--teal);
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: var(--teal);
     }
-    
+
+    .tab-btn.active {
+        background: var(--teal);
+        color: var(--white);
+    }
+
+    .tab-btn:hover {
+        background: var(--teal);
+        color: var(--white);
+    }
+
+    .feedback-tab {
+        display: none;
+    }
+
+    .feedback-tab.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .feedback-grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
     }
-}
+
+    .feedback-card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .feedback-rating {
+        color: #ffc107;
+        margin-bottom: 15px;
+    }
+
+    .feedback-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--gray-dark);
+        margin-bottom: 20px;
+        font-style: italic;
+    }
+
+    .feedback-author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .author-initial {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #26a69a, #1e847a);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .author-details h4 {
+        font-size: 1rem;
+        margin-bottom: 3px;
+    }
+
+    .author-details small {
+        font-size: 0.7rem;
+        color: var(--gray);
+        display: block;
+    }
+
+    .author-details .treatment {
+        color: var(--teal);
+        margin-top: 3px;
+    }
+
+    .admin-response {
+        background: var(--teal-bg);
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+
+    .admin-response i {
+        color: var(--teal);
+        margin-top: 2px;
+    }
+
+    .admin-response p {
+        margin: 0;
+        color: var(--gray-dark);
+    }
+
+    .no-feedback {
+        text-align: center;
+        padding: 40px;
+        background: var(--white);
+        border-radius: 20px;
+        color: var(--gray);
+    }
+
+    .feedback-cta {
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 1px solid var(--gray-medium);
+    }
+
+    .feedback-cta p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .feedback-tabs {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab-btn {
+            width: 200px;
+        }
+
+        .feedback-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <script>
@@ -776,12 +781,12 @@
         // Hide all tabs
         document.getElementById('clinic-feedback').classList.remove('active');
         document.getElementById('doctor-feedback').classList.remove('active');
-        
+
         // Remove active class from all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        
+
         // Show selected tab
         if (tabName === 'clinic') {
             document.getElementById('clinic-feedback').classList.add('active');
@@ -791,9 +796,9 @@
             document.querySelector('.tab-btn:last-child').classList.add('active');
         }
     }
-    
+
     // Feedback modal - you can implement this later
-    document.getElementById('giveFeedbackBtn')?.addEventListener('click', function(e) {
+    document.getElementById('giveFeedbackBtn')?.addEventListener('click', function (e) {
         e.preventDefault();
         alert('Feedback form will be added soon. For now, please contact clinic directly.');
     });
@@ -1118,8 +1123,6 @@
             font-size: 0.6rem;
         }
     }
-
-    
 </style>
 
 {% endblock %}
